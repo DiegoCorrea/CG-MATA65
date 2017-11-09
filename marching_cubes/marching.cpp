@@ -15,18 +15,19 @@ using namespace std;
 FILE *fl_DEBUG;
 int LUT[LUTLINES][LUTCOLUMN];
 int planSize;
-int isoValue;
+float isoValue;
 
 class Vertex {
   int coordinateX, coordinateY, coordinateZ;
-  int status;
+  int status, id;
 
   public:
-    Vertex(int x, int y, int z, int status){
+    Vertex(int x, int y, int z, int status, int id){
       this->coordinateX = x;
       this->coordinateY = y;
       this->coordinateZ = z;
       this->status = status;
+      this->id = id;
     }
 
     int getCoordinateX(){
@@ -44,6 +45,10 @@ class Vertex {
     int getStatus(){
     	return status;
     }
+
+    int getID(){
+    	return id;
+    }
 };
 
 class Grid {
@@ -55,7 +60,8 @@ class Grid {
 		}
 
 		void addVertex(int x, int y, int z, int status) {
-      Vertex vertex(x, y, z, status);
+			int id = vertices.size();
+      Vertex vertex(x, y, z, status, id);
       vertices.push_back(vertex);
     }
 
@@ -63,7 +69,7 @@ class Grid {
     	int size_vertices = vertices.size();
 
     	for(int i = 0; i < size_vertices; i++){
-    		fprintf(fl_DEBUG, "[GRID] - (%d, %d, %d) - Status %d\n", vertices[i].getCoordinateX(), vertices[i].getCoordinateY(), vertices[i].getCoordinateZ(), vertices[i].getStatus());
+    		fprintf(fl_DEBUG, "[GRID] ID: %d - (%d, %d, %d) - Status %d\n", vertices[i].getID(),vertices[i].getCoordinateX(), vertices[i].getCoordinateY(), vertices[i].getCoordinateZ(), vertices[i].getStatus());
     	}
     }
 };
@@ -147,8 +153,8 @@ void readFile(int argc, char *argv[]){
 
 	MarchingGrid.allVertex();
 
-	fscanf(fl_input, "%d", &isoValue);
-	fprintf(fl_DEBUG, "[readFile] - O Iso Valor é: %d ", isoValue);
+	fscanf(fl_input, "%f", &isoValue);
+	fprintf(fl_DEBUG, "[readFile] - O Iso Valor é: %f \n", isoValue);
 
 	fclose( fl_input );
 	// <DEBUG>
@@ -159,3 +165,8 @@ void readFile(int argc, char *argv[]){
 }
 
 
+void vertexInterpolation(Vertex origin, Vertex master) {
+	float x, y, z, point;
+
+
+}
