@@ -65,6 +65,7 @@ void allVertex() {
 } // </DEBUG>
 
 void readFile(int argc, char *argv[]);
+void showCubes();
 
 int main(int argc, char *argv[]){	
 	if (argc < 2){
@@ -82,7 +83,7 @@ int main(int argc, char *argv[]){
 
 
 	readFile(argc, argv);
-
+	showCubes();
 
 	// <DEBUG>
 	if (DEBUG == 1){
@@ -158,6 +159,24 @@ void readFile(int argc, char *argv[]){
 		printf("[readFile] - Finalizando Função\n");
 		fprintf(GL_fl_DEBUG, "[readFile] - Finalizando Função\n");
 	} // </DEBUG>
+}
+
+void showCubes(){
+	for(int z = 0; z < planSize-1; z++){
+		for(int y = 0; y < planSize-1; y++ ) {
+			for(int x = 0; x < planSize-1; x++){
+				printf("Cubo\n");
+				printf("Vertice 1: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y][x].getCoordinateX(), cubeVertices[z][y][x].getCoordinateY(), cubeVertices[z][y][x].getCoordinateZ(), cubeVertices[z][y][x].getStatus());
+				printf("Vertice 2: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y][x+1].getCoordinateX(), cubeVertices[z][y][x+1].getCoordinateY(), cubeVertices[z][y][x+1].getCoordinateZ(), cubeVertices[z][y][x+1].getStatus());
+				printf("Vertice 3: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y+1][x].getCoordinateX(), cubeVertices[z][y+1][x].getCoordinateY(), cubeVertices[z][y+1][x].getCoordinateZ(), cubeVertices[z][y+1][x].getStatus());
+				printf("Vertice 4: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y+1][x+1].getCoordinateX(), cubeVertices[z][y+1][x+1].getCoordinateY(), cubeVertices[z][y+1][x+1].getCoordinateZ(), cubeVertices[z][y+1][x+1].getStatus());
+				printf("Vertice 5: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z+1][y][x].getCoordinateX(), cubeVertices[z+1][y][x].getCoordinateY(), cubeVertices[z+1][y][x].getCoordinateZ(), cubeVertices[z+1][y][x].getStatus());
+				printf("Vertice 6: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z+1][y][x+1].getCoordinateX(), cubeVertices[z+1][y][x+1].getCoordinateY(), cubeVertices[z+1][y][x+1].getCoordinateZ(), cubeVertices[z+1][y][x+1].getStatus());
+				printf("Vertice 7: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z+1][y+1][x].getCoordinateX(), cubeVertices[z+1][y+1][x].getCoordinateY(), cubeVertices[z+1][y+1][x].getCoordinateZ(), cubeVertices[z+1][y+1][x].getStatus());
+				printf("Vertice 8: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z+1][y+1][x+1].getCoordinateX(), cubeVertices[z+1][y+1][x+1].getCoordinateY(), cubeVertices[z+1][y+1][x+1].getCoordinateZ(), cubeVertices[z+1][y+1][x+1].getStatus());
+			}
+		}
+	}
 }
 
 
