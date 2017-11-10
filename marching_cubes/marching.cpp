@@ -13,6 +13,8 @@ using namespace std;
 
 FILE *GL_fl_DEBUG;
 int LUT[LUTLINES][LUTCOLUMN];
+int planSize;
+float isoValue;
 
 class Vertex{
   private:
@@ -20,12 +22,11 @@ class Vertex{
   	int status, id;
 
   public:
-    Vertex(int x, int y, int z, int status, int id){
+    Vertex(int x, int y, int z, int status){
       this->coordinateX = x;
       this->coordinateY = y;
       this->coordinateZ = z;
       this->status = status;
-      this->id = id;
     }
     ~Vertex(){};
 
@@ -50,73 +51,22 @@ class Vertex{
     }
 };
 
-class Grid{
-	int planSize;
-	float isoValue;
-	vector<vector<vector<Vertex> > > vertices;
+vector<vector<vector<Vertex> > > cubeVertices;
 
-	public:
-		Grid(){ }
-
-		int getPlanSize(){
-    	return this->planSize;
-    }
-
-    int getIsoValue(){
-    	return this->isoValue;
-    }
-
-    bool setIsoValue(int newIsoValue){
-    	this->isoValue = newIsoValue;
-    	return true;
-    }
-
-		void addVertex(int x, int y, int z, int status){
-			int id = vertices.size();
-      Vertex vertex(x, y, z, status, id);
-
-      this->vertices[z][y][x] = vertex;
-    }
-
-    
-    bool makePlan(int newPlanSize){
-    	if(newPlanSize < 1){	
-    		return false;
-    	}
-
-    	this->planSize = newPlanSize;
-    	// Set up sizes. (planSize x planSize x planSize)
-		  this->vertices.resize(newPlanSize);
-		  for (int x = 0; x < newPlanSize; ++x){
-		    this->vertices[x].resize(newPlanSize);
-		    for (int y = 0; y < newPlanSize; ++y){
-		      //this->vertices[y][x].resize(newPlanSize);
-		    }
-		  }
-
-		  return true;
-    }
-    
-
-    // <DEBUG>
-    void allVertex() {
-    	int size_vertices = this->vertices.size();
-
-    	for(int x = 0; x < size_vertices; x++){
-    		for(int y = 0; y < size_vertices; y++){
-    			for(int z = 0; z < size_vertices; z++){
-   					fprintf(GL_fl_DEBUG, "[GRID] ID: %d - (%d, %d, %d) - Status %d\n", this->vertices[z][y][x].getID(), this->vertices[z][y][x].getCoordinateX(), this->vertices[z][y][x].getCoordinateY(), this->vertices[z][y][x].getCoordinateZ(), this->vertices[z][y][x].getStatus());
-    			}
-    		}
-    	}
-    } // </DEBUG>
-};
-
-Grid Space;
+// <DEBUG>
+void allVertex() {
+	for(int x = 0; x < planSize; x++){
+		for(int y = 0; y < planSize; y++){
+			for(int z = 0; z < planSize; z++){
+				fprintf(GL_fl_DEBUG, "[GRID] - (%d, %d, %d) - Status %d\n", cubeVertices[z][y][x].getCoordinateX(), cubeVertices[z][y][x].getCoordinateY(), cubeVertices[z][y][x].getCoordinateZ(), cubeVertices[z][y][x].getStatus());
+			}
+		}
+	}
+} // </DEBUG>
 
 void readFile(int argc, char *argv[]);
 
-int main(int argc, char *argv[]) {	
+int main(int argc, char *argv[]){	
 	if (argc < 2){
 		printf("Para executar é necessario um arquivo de entrada\n");
 		printf("O Marching Cubes será fechado!\n");
@@ -159,7 +109,7 @@ void readFile(int argc, char *argv[]){
     exit(1);
   }
 
-  for(int i = 0; i < LUTLINES; i++) {
+  for(int i = 0; i < LUTLINES; i++){
   	for(int j = 0; j < LUTCOLUMN; j++){
   	  fscanf(fl_input, "%d", &LUT[i][j]);
   	}
@@ -168,8 +118,7 @@ void readFile(int argc, char *argv[]){
   // <DEBUG>
 	if (DEBUG == 1){
 		for(int i = 0; i < LUTLINES; i++) {
-			fprintf(GL_fl_DEBUG, "[readFile] Linha '%d': - ", i+1);
-	    
+			fprintf(GL_fl_DEBUG, "[readFile] Linha '%d': - ", i);
 	    for(int j = 0; j < LUTCOLUMN; j++){
 				fprintf(GL_fl_DEBUG, "%d ", LUT[i][j]);
 	    }
@@ -177,45 +126,35 @@ void readFile(int argc, char *argv[]){
 	  }
 	} // </DEBUG>
 
-	int planSize;
 	fscanf(fl_input, "%d", &planSize);
 	int v[planSize][planSize][planSize];
-	Space.makePlan(planSize);
 
 	for(int z = 0; z < planSize; z++){
+		vector < vector < Vertex > > d2;
+		cubeVertices.push_back( d2 );
 		for(int y = 0; y < planSize; y++) {
+			vector <Vertex> d3;
+      cubeVertices[z].push_back( d3 );
 			for (int x = 0; x < planSize; ++x) {
 				fscanf(fl_input, "%d", &v[z][y][x]);
-				Space.addVertex(x,-y,-z,v[z][y][x]);
+
+				Vertex vertice(x,y,z,v[z][y][x]);
+        cubeVertices[z][y].push_back( vertice);
 			}
 		}
 	}
-
+	fscanf(fl_input, "%f", &isoValue);
 	// <DEBUG>
 	if (DEBUG == 1){
 		fprintf(GL_fl_DEBUG, "[readFile] - O tamanho do Plano é: '%d'\n", planSize);
-		for(int z = 0; z < planSize; z++){
-			for(int y = 0; y < planSize; y++){
-				for (int x = 0; x < planSize; ++x){
-					fprintf(GL_fl_DEBUG, "%d ", v[z][y][x]);
-				}
-				fprintf(GL_fl_DEBUG, "\n");
-			}
-		}
+		allVertex();
+		fprintf(GL_fl_DEBUG, "[readFile] - O Iso Valor é: %f \n", isoValue);
 	} // </DEBUG>
-
-
-	//Space.allVertex();
-
-	float isoValue;
-	fscanf(fl_input, "%f", &isoValue);
-	Space.setIsoValue(isoValue);
-
-	fprintf(GL_fl_DEBUG, "[readFile] - O Iso Valor é: %f \n", isoValue);
 
 	fclose( fl_input );
 	// <DEBUG>
 	if (DEBUG == 1){
+
 		printf("[readFile] - Finalizando Função\n");
 		fprintf(GL_fl_DEBUG, "[readFile] - Finalizando Função\n");
 	} // </DEBUG>
