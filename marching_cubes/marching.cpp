@@ -78,7 +78,7 @@ class Grid{
       this->vertices[z][y][x] = vertex;
     }
 
-    /*
+    
     bool makePlan(int newPlanSize){
     	if(newPlanSize < 1){	
     		return false;
@@ -90,13 +90,13 @@ class Grid{
 		  for (int x = 0; x < newPlanSize; ++x){
 		    this->vertices[x].resize(newPlanSize);
 		    for (int y = 0; y < newPlanSize; ++y){
-		      this->vertices[y][x].resize(newPlanSize);
+		      //this->vertices[y][x].resize(newPlanSize);
 		    }
 		  }
 
 		  return true;
     }
-    */
+    
 
     // <DEBUG>
     void allVertex() {
@@ -180,13 +180,13 @@ void readFile(int argc, char *argv[]){
 	int planSize;
 	fscanf(fl_input, "%d", &planSize);
 	int v[planSize][planSize][planSize];
-	//Space.makePlan(planSize);
+	Space.makePlan(planSize);
 
 	for(int z = 0; z < planSize; z++){
 		for(int y = 0; y < planSize; y++) {
 			for (int x = 0; x < planSize; ++x) {
 				fscanf(fl_input, "%d", &v[z][y][x]);
-				//Space.addVertex(x,-y,-z,v[z][y][x]);
+				Space.addVertex(x,-y,-z,v[z][y][x]);
 			}
 		}
 	}
