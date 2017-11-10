@@ -197,7 +197,7 @@ void readFile(int argc, char *argv[]){
 		for(int z = 0; z < planSize; z++){
 			for(int y = 0; y < planSize; y++){
 				for (int x = 0; x < planSize; ++x){
-					fprintf(GL_fl_DEBUG, "%d ", v[x][y][x]);
+					fprintf(GL_fl_DEBUG, "%d ", v[z][y][x]);
 				}
 				fprintf(GL_fl_DEBUG, "\n");
 			}
