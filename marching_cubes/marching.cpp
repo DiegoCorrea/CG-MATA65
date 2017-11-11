@@ -206,7 +206,7 @@ void showCubes(){
 				ver[6] = cubeVertices[z][y][x+1].getStatus();
 				ver[7] = cubeVertices[z][y][x].getStatus();
 
-				config = convertBinaryToDecimal(makeBinary(ver)) + 1;
+				config = convertBinaryToDecimal(makeBinary(ver));
 
 				// <DEBUG>
 				if (DEBUG == 1){
