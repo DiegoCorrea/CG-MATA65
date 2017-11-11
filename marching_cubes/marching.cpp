@@ -2,7 +2,11 @@ using namespace std;
 # include <stdlib.h>
 # include <vector>
 # include <algorithm>
-
+#include <iostream>
+#include <iomanip>
+#include <numeric>
+#include <iterator>
+#include <limits>
 # include <string.h>
 # include <stdio.h>
 # include <math.h>
@@ -63,7 +67,7 @@ void allVertex() {
 		}
 	}
 } // </DEBUG>
-
+int convertBinaryToDecimal(long long n);
 void readFile(int argc, char *argv[]);
 void showCubes();
 
@@ -160,20 +164,62 @@ void readFile(int argc, char *argv[]){
 		fprintf(GL_fl_DEBUG, "[readFile] - Finalizando Função\n");
 	} // </DEBUG>
 }
+int convertBinaryToDecimal(int n){
+    int decimalNumber = 0, i = 0, remainder;
+    while (n!=0)
+    {
+        remainder = n%10;
+        n /= 10;
+        decimalNumber += remainder*pow(2,i);
+        ++i;
+    }
+    return decimalNumber;
+}
+int makeBinary(int vec[8]){
+	int finalValue = 0;
 
+	finalValue += vec[7]*1;
+	finalValue += vec[6]*10;
+	finalValue += vec[5]*100;
+	finalValue += vec[4]*1000;
+	finalValue += vec[3]*10000;
+	finalValue += vec[2]*100000;
+	finalValue += vec[1]*1000000;
+	finalValue += vec[0]*10000000;
+
+	return finalValue;
+}
 void showCubes(){
-	for(int z = 0; z < planSize-1; z++){
+	int totalCubes = (planSize-1)*(planSize-1)*(planSize-1);
+	int ver[8], c;
+	for(int z = 0, cb = 0; z < planSize-1; z++){
 		for(int y = 0; y < planSize-1; y++ ) {
 			for(int x = 0; x < planSize-1; x++){
-				printf("Cubo\n");
-				printf("Vertice 1: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y][x].getCoordinateX(), cubeVertices[z][y][x].getCoordinateY(), cubeVertices[z][y][x].getCoordinateZ(), cubeVertices[z][y][x].getStatus());
-				printf("Vertice 2: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y][x+1].getCoordinateX(), cubeVertices[z][y][x+1].getCoordinateY(), cubeVertices[z][y][x+1].getCoordinateZ(), cubeVertices[z][y][x+1].getStatus());
-				printf("Vertice 3: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y+1][x].getCoordinateX(), cubeVertices[z][y+1][x].getCoordinateY(), cubeVertices[z][y+1][x].getCoordinateZ(), cubeVertices[z][y+1][x].getStatus());
-				printf("Vertice 4: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y+1][x+1].getCoordinateX(), cubeVertices[z][y+1][x+1].getCoordinateY(), cubeVertices[z][y+1][x+1].getCoordinateZ(), cubeVertices[z][y+1][x+1].getStatus());
-				printf("Vertice 5: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z+1][y][x].getCoordinateX(), cubeVertices[z+1][y][x].getCoordinateY(), cubeVertices[z+1][y][x].getCoordinateZ(), cubeVertices[z+1][y][x].getStatus());
-				printf("Vertice 6: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z+1][y][x+1].getCoordinateX(), cubeVertices[z+1][y][x+1].getCoordinateY(), cubeVertices[z+1][y][x+1].getCoordinateZ(), cubeVertices[z+1][y][x+1].getStatus());
-				printf("Vertice 7: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z+1][y+1][x].getCoordinateX(), cubeVertices[z+1][y+1][x].getCoordinateY(), cubeVertices[z+1][y+1][x].getCoordinateZ(), cubeVertices[z+1][y+1][x].getStatus());
-				printf("Vertice 8: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z+1][y+1][x+1].getCoordinateX(), cubeVertices[z+1][y+1][x+1].getCoordinateY(), cubeVertices[z+1][y+1][x+1].getCoordinateZ(), cubeVertices[z+1][y+1][x+1].getStatus());
+				cb += 1;
+
+				ver[0] = cubeVertices[z+1][y+1][x].getStatus();
+				ver[1] = cubeVertices[z+1][y+1][x+1].getStatus();
+				ver[2] = cubeVertices[z][y+1][x+1].getStatus();
+				ver[3] = cubeVertices[z][y+1][x].getStatus();
+				ver[4] = cubeVertices[z+1][y][x].getStatus();
+				ver[5] = cubeVertices[z+1][y][x+1].getStatus();
+				ver[6] = cubeVertices[z][y][x+1].getStatus();
+				ver[7] = cubeVertices[z][y][x].getStatus();
+
+				c = convertBinaryToDecimal(makeBinary(ver)) + 1;
+
+				// <DEBUG>
+				if (DEBUG == 1){
+					fprintf(GL_fl_DEBUG, "[Cubo %d] - Config number : %d\n", cb,c);
+					fprintf(GL_fl_DEBUG, "Vertice 1: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y][x].getCoordinateX(), cubeVertices[z][y][x].getCoordinateY(), cubeVertices[z][y][x].getCoordinateZ(), cubeVertices[z][y][x].getStatus());
+					fprintf(GL_fl_DEBUG, "Vertice 2: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x+1, y, z, cubeVertices[z][y][x+1].getCoordinateX(), cubeVertices[z][y][x+1].getCoordinateY(), cubeVertices[z][y][x+1].getCoordinateZ(), cubeVertices[z][y][x+1].getStatus());
+					fprintf(GL_fl_DEBUG, "Vertice 3: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x+1, y, z+1, cubeVertices[z+1][y][x+1].getCoordinateX(), cubeVertices[z+1][y][x+1].getCoordinateY(), cubeVertices[z+1][y][x+1].getCoordinateZ(), cubeVertices[z+1][y][x+1].getStatus());
+					fprintf(GL_fl_DEBUG, "Vertice 4: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z+1, cubeVertices[z+1][y][x].getCoordinateX(), cubeVertices[z+1][y][x].getCoordinateY(), cubeVertices[z+1][y][x].getCoordinateZ(), cubeVertices[z+1][y][x].getStatus());
+					fprintf(GL_fl_DEBUG, "Vertice 5: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y+1, z, cubeVertices[z][y+1][x].getCoordinateX(), cubeVertices[z][y+1][x].getCoordinateY(), cubeVertices[z][y+1][x].getCoordinateZ(), cubeVertices[z][y+1][x].getStatus());
+					fprintf(GL_fl_DEBUG, "Vertice 6: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x+1, y+1, z, cubeVertices[z][y+1][x+1].getCoordinateX(), cubeVertices[z][y+1][x+1].getCoordinateY(), cubeVertices[z][y+1][x+1].getCoordinateZ(), cubeVertices[z][y+1][x+1].getStatus());
+					fprintf(GL_fl_DEBUG, "Vertice 7: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x+1, y+1, z+1, cubeVertices[z+1][y+1][x+1].getCoordinateX(), cubeVertices[z+1][y+1][x+1].getCoordinateY(), cubeVertices[z+1][y+1][x+1].getCoordinateZ(), cubeVertices[z+1][y+1][x+1].getStatus());
+					fprintf(GL_fl_DEBUG, "Vertice 8: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y+1, z+1, cubeVertices[z+1][y+1][x].getCoordinateX(), cubeVertices[z+1][y+1][x].getCoordinateY(), cubeVertices[z+1][y+1][x].getCoordinateZ(), cubeVertices[z+1][y+1][x].getStatus());
+				} // </DEBUG>
 			}
 		}
 	}
