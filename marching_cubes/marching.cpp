@@ -191,7 +191,7 @@ int makeBinary(int vec[8]){
 }
 void showCubes(){
 	int totalCubes = (planSize-1)*(planSize-1)*(planSize-1);
-	int ver[8], c;
+	int ver[8], config = 0;
 	for(int z = 0, cb = 0; z < planSize-1; z++){
 		for(int y = 0; y < planSize-1; y++ ) {
 			for(int x = 0; x < planSize-1; x++){
@@ -206,11 +206,15 @@ void showCubes(){
 				ver[6] = cubeVertices[z][y][x+1].getStatus();
 				ver[7] = cubeVertices[z][y][x].getStatus();
 
-				c = convertBinaryToDecimal(makeBinary(ver)) + 1;
+				config = convertBinaryToDecimal(makeBinary(ver)) + 1;
 
 				// <DEBUG>
 				if (DEBUG == 1){
-					fprintf(GL_fl_DEBUG, "[Cubo %d] - Config number : %d\n", cb,c);
+					fprintf(GL_fl_DEBUG, "[Cubo %d] - Config number : %d\n", cb,config);
+					for(int j = 0; j < LUTCOLUMN; j++){
+						fprintf(GL_fl_DEBUG, "%d ", LUT[config][j]);
+	    		}
+	    		fprintf(GL_fl_DEBUG, "\n");
 					fprintf(GL_fl_DEBUG, "Vertice 1: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y][x].getCoordinateX(), cubeVertices[z][y][x].getCoordinateY(), cubeVertices[z][y][x].getCoordinateZ(), cubeVertices[z][y][x].getStatus());
 					fprintf(GL_fl_DEBUG, "Vertice 2: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x+1, y, z, cubeVertices[z][y][x+1].getCoordinateX(), cubeVertices[z][y][x+1].getCoordinateY(), cubeVertices[z][y][x+1].getCoordinateZ(), cubeVertices[z][y][x+1].getStatus());
 					fprintf(GL_fl_DEBUG, "Vertice 3: (%d, %d, %d) ou (%d, %d, %d) : status %d\n", x+1, y, z+1, cubeVertices[z+1][y][x+1].getCoordinateX(), cubeVertices[z+1][y][x+1].getCoordinateY(), cubeVertices[z+1][y][x+1].getCoordinateZ(), cubeVertices[z+1][y][x+1].getStatus());
