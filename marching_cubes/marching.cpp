@@ -33,6 +33,13 @@ class Vertex{
       this->coordinateZ = z;
       this->value = value;
     }
+    Vertex(int x, int y, int z, int value, int id){
+      this->coordinateX = x;
+      this->coordinateY = y;
+      this->coordinateZ = z;
+      this->value = value;
+      this->id = id;
+    }
     ~Vertex(){};
 
     int getCoordinateX(){
@@ -156,7 +163,7 @@ void readFile(int argc, char *argv[]){
 				fscanf(fl_input, "%d", &v[z][y][x]);
 
 				Vertex vertice(x,y,z,v[z][y][x]);
-        cubeVertices[z][y].push_back( vertice);
+        cubeVertices[z][y].push_back(vertice);
 			}
 		}
 	}
@@ -175,6 +182,7 @@ void readFile(int argc, char *argv[]){
 		fprintf(GL_fl_DEBUG, "\n\n");
 	} // </DEBUG>
 }
+
 int convertBinaryToDecimal(int n){
     int decimalNumber = 0, i = 0, remainder;
     while (n!=0)
@@ -186,6 +194,7 @@ int convertBinaryToDecimal(int n){
     }
     return decimalNumber;
 }
+
 int makeBinary(int vec[8]){
 	int finalValue = 0;
 
@@ -200,6 +209,7 @@ int makeBinary(int vec[8]){
 
 	return finalValue;
 }
+
 void makeCubes(){
 	int totalCubes = (planSize-1)*(planSize-1)*(planSize-1);
 	int binaryConfig[8], decimalConfig = 0;
@@ -212,6 +222,7 @@ void makeCubes(){
 	for(int z = 0, cb = 0; z < planSize-1; z++){
 		for(int y = 0; y < planSize-1; y++ ) {
 			for(int x = 0; x < planSize-1; x++){
+				int id = 0;
 				cb += 1;
 
 				binaryConfig[0] = cubeVertices[z+1][y+1][x].isMarked();
@@ -241,29 +252,58 @@ void makeCubes(){
 					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 6: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x+1, y+1, z, cubeVertices[z][y+1][x+1].getCoordinateX(), cubeVertices[z][y+1][x+1].getCoordinateY(), cubeVertices[z][y+1][x+1].getCoordinateZ(), cubeVertices[z][y+1][x+1].getValue());
 					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 7: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x+1, y+1, z+1, cubeVertices[z+1][y+1][x+1].getCoordinateX(), cubeVertices[z+1][y+1][x+1].getCoordinateY(), cubeVertices[z+1][y+1][x+1].getCoordinateZ(), cubeVertices[z+1][y+1][x+1].getValue());
 					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 8: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x, y+1, z+1, cubeVertices[z+1][y+1][x].getCoordinateX(), cubeVertices[z+1][y+1][x].getCoordinateY(), cubeVertices[z+1][y+1][x].getCoordinateZ(), cubeVertices[z+1][y+1][x].getValue());
+
+					fprintf(GL_fl_DEBUG, "\n");
+					fprintf(GL_fl_DEBUG, "[makeCubes] - Reconhecendo Arestas\n");
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x,y,z, x+1,y,z, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x+1,y,z, x+1,y,z+1, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x+1,y,z+1, x,y,z+1, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x,y,z+1, x,y,z, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x,y+1,z, x+1,y+1,z, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x+1,y+1,z, x+1,y+1,z+1, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x+1,y+1,z+1, x,y+1,z+1, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x,y+1,z+1, x,y+1,z, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x,y,z, x,y+1,z, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x+1,y,z, x+1,y+1,z, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x+1,y,z+1, x+1,y+1,z+1, id);
+					id++;
+					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x,y,z+1, x,y+1,z+1, id);
+					id++;
+
+
+					fprintf(GL_fl_DEBUG, "-------------------------------------------------------------------------------\n");
 				} // </DEBUG>
 			}
 		}
 	}
 }
 
-
 Vertex vertexInterpolation(Vertex origin, Vertex master) {
 	float x = 0, y = 0, z = 0, point;
 
-	float p1 = (std::abs(isoValue - master.getValue())/std::abs(master.getValue() - origin.getValue()));
+	float p1 = (std::abs(isoValue - master.getValue()) / std::abs(master.getValue() - origin.getValue()));
 	x = origin.getCoordinateX() * p1;
 	y = origin.getCoordinateY() * p1;
 	z = origin.getCoordinateZ() * p1;
 
-	float p2 = (std::abs(isoValue - origin.getValue())/std::abs(master.getValue() - origin.getValue()));
+	float p2 = (std::abs(isoValue - origin.getValue()) / std::abs(master.getValue() - origin.getValue()));
 
 	x += (master.getCoordinateX() * p2);
 	y += (master.getCoordinateY() * p2);
 	z += (master.getCoordinateZ() * p2);
 	// <DEBUG>
 	if (DEBUG == 1){
-		fprintf(GL_fl_DEBUG, "[vertexInterpolation] - Novo vertice: (%f, %f, %f)\n", x, y, z);
+		fprintf(GL_fl_DEBUG, "\n\n[vertexInterpolation] - Novo vertice: (%f, %f, %f)\n", x, y, z);
 		fprintf(GL_fl_DEBUG, "\n\n");
 	} // </DEBUG>
 
