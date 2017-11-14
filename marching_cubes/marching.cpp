@@ -93,7 +93,7 @@ int main(int argc, char *argv[]){
 	// <DEBUG>
 	if (DEBUG == 1){
 		fprintf(GL_fl_DEBUG, "[main] - Vertice %d e %d\n", cubeVertices[0][1][1].getValue(), cubeVertices[1][1][1].getValue());
-		fprintf(GL_fl_DEBUG, "[main] - Valor do novo vertice %f\n", v.getValue());
+		fprintf(GL_fl_DEBUG, "[main] - Valor do novo vertice %d\n", v.getValue());
 		fprintf(GL_fl_DEBUG, "[main] - Finalizando Programa\n");
 	} // </DEBUG>
 	fclose( GL_fl_DEBUG );
@@ -249,7 +249,8 @@ void makeCubes(){
 
 
 Vertex vertexInterpolation(Vertex origin, Vertex master) {
-	float x, y, z, point;
+	float x = 0, y = 0, z = 0, point;
+
 	float p1 = (std::abs(isoValue - master.getValue())/std::abs(master.getValue() - origin.getValue()));
 	x = origin.getCoordinateX() * p1;
 	y = origin.getCoordinateY() * p1;
@@ -257,9 +258,14 @@ Vertex vertexInterpolation(Vertex origin, Vertex master) {
 
 	float p2 = (std::abs(isoValue - origin.getValue())/std::abs(master.getValue() - origin.getValue()));
 
-	x += master.getCoordinateX() * p2;
-	y += master.getCoordinateY() * p2;
-	z += master.getCoordinateZ() * p2;
+	x += (master.getCoordinateX() * p2);
+	y += (master.getCoordinateY() * p2);
+	z += (master.getCoordinateZ() * p2);
+	// <DEBUG>
+	if (DEBUG == 1){
+		fprintf(GL_fl_DEBUG, "[vertexInterpolation] - Novo vertice: (%f, %f, %f)\n", x, y, z);
+		fprintf(GL_fl_DEBUG, "\n\n");
+	} // </DEBUG>
 
 	Vertex vertice(x,y,z,isoValue);
 	return vertice;
