@@ -17,6 +17,7 @@ using namespace std;
 # define FALSE 0
 # define LUTLINES 256
 # define LUTCOLUMN 16
+# define OUTPUT "malha.obj"
 
 FILE *GL_fl_DEBUG;
 int LUT[LUTLINES][LUTCOLUMN];
@@ -122,10 +123,33 @@ class VertexOfTheObject{
     int getId(){
     	return this->id;
     }	
+
+    void setId(int id){
+    	this->id = id;
+    }
 };
 std::vector<VertexOfTheObject> newVertices;
 
+class Triangule {
+	private:
+		VertexOfTheObject coordinates[3];
 
+	public:
+		Triangule(VertexOfTheObject first, VertexOfTheObject middle, VertexOfTheObject end){
+			this->coordinates[0] = first;
+			this->coordinates[1] = middle;
+			this->coordinates[2] = end;
+
+		}
+
+		~Triangule(){ }
+
+		VertexOfTheObject* getCoordinates(){
+			return this->coordinates;
+		}
+
+};
+std::vector<Triangule> trianguleOfTheObjects;
 
 class Cube {
 	private:
@@ -198,6 +222,8 @@ VertexOfTheObject vertexInterpolation(Vertex *origin, Vertex *master);
 VertexOfTheObject insertNotDuplicate(VertexOfTheObject vertex);
 void cubeInterpolation(Cube *cube);
 void printAllNewVertices();
+void printAllTriangules();
+void printOBJ();
 
 int main(int argc, char *argv[]){	
 	if (argc < 2){
@@ -217,6 +243,11 @@ int main(int argc, char *argv[]){
 	makeCubes();
 
 	printAllNewVertices();
+
+	printAllTriangules();
+
+	printOBJ();
+
 	fclose( GL_fl_DEBUG );
 
 	return 0;
@@ -423,6 +454,7 @@ VertexOfTheObject insertNotDuplicate(VertexOfTheObject vertex){
 			return newVertices[i];
 		}
 	}
+	vertex.setId(newVertices.size()+1);
 	newVertices.push_back(vertex);
 
 	return vertex;
@@ -430,44 +462,67 @@ VertexOfTheObject insertNotDuplicate(VertexOfTheObject vertex){
 void cubeInterpolation(Cube *cube){
 	VertexOfTheObject vertex;
 	if(cube->getVertex(0)->isMarked() == TRUE ){
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(0), cube->getVertex(1)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(0), cube->getVertex(4)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(0), cube->getVertex(3)));
+		Triangule tri(
+			insertNotDuplicate(vertexInterpolation(cube->getVertex(0), cube->getVertex(1))),
+			insertNotDuplicate(vertexInterpolation(cube->getVertex(0), cube->getVertex(4))),
+			insertNotDuplicate(vertexInterpolation(cube->getVertex(0), cube->getVertex(3)))
+			);
+		trianguleOfTheObjects.push_back(tri);
 	}
 	if(cube->getVertex(1)->isMarked() == TRUE ){
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(1), cube->getVertex(2)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(1), cube->getVertex(5)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(1), cube->getVertex(0)));
+		Triangule tri(insertNotDuplicate(vertexInterpolation(cube->getVertex(1), cube->getVertex(2)))
+		,insertNotDuplicate(vertexInterpolation(cube->getVertex(1), cube->getVertex(5)))
+		,insertNotDuplicate(vertexInterpolation(cube->getVertex(1), cube->getVertex(0)))
+		);
+		trianguleOfTheObjects.push_back(tri);
 	}
 	if(cube->getVertex(2)->isMarked() == TRUE ){
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(2), cube->getVertex(3)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(2), cube->getVertex(6)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(2), cube->getVertex(1)));
+		Triangule tri(
+		insertNotDuplicate(vertexInterpolation(cube->getVertex(2), cube->getVertex(3)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(2), cube->getVertex(6)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(2), cube->getVertex(1)))
+		);
+		trianguleOfTheObjects.push_back(tri);
 	}
 	if(cube->getVertex(3)->isMarked() == TRUE ){
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(3), cube->getVertex(0)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(3), cube->getVertex(7)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(3), cube->getVertex(2)));
+		Triangule tri(
+		insertNotDuplicate(vertexInterpolation(cube->getVertex(3), cube->getVertex(0)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(3), cube->getVertex(7)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(3), cube->getVertex(2)))
+		);
+		trianguleOfTheObjects.push_back(tri);
 	}
 	if(cube->getVertex(4)->isMarked() == TRUE ){
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(4), cube->getVertex(5)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(4), cube->getVertex(0)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(4), cube->getVertex(7)));
+		Triangule tri(
+		insertNotDuplicate(vertexInterpolation(cube->getVertex(4), cube->getVertex(5)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(4), cube->getVertex(0)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(4), cube->getVertex(7)))
+		);
+		trianguleOfTheObjects.push_back(tri);
 	}
 	if(cube->getVertex(5)->isMarked() == TRUE ){
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(5), cube->getVertex(6)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(5), cube->getVertex(1)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(5), cube->getVertex(4)));
+		Triangule tri(
+		insertNotDuplicate(vertexInterpolation(cube->getVertex(5), cube->getVertex(6)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(5), cube->getVertex(1)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(5), cube->getVertex(4)))
+		);
+		trianguleOfTheObjects.push_back(tri);
 	}
 	if(cube->getVertex(6)->isMarked() == TRUE ){
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(6), cube->getVertex(7)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(6), cube->getVertex(2)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(6), cube->getVertex(5)));
+		Triangule tri(
+		insertNotDuplicate(vertexInterpolation(cube->getVertex(6), cube->getVertex(7)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(6), cube->getVertex(2)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(6), cube->getVertex(5)))
+		);
+		trianguleOfTheObjects.push_back(tri);
 	}
 	if(cube->getVertex(7)->isMarked() == TRUE ){
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(7), cube->getVertex(4)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(7), cube->getVertex(3)));
-		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(7), cube->getVertex(6)));
+		Triangule tri(
+		insertNotDuplicate(vertexInterpolation(cube->getVertex(7), cube->getVertex(4)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(7), cube->getVertex(3)))
+		, insertNotDuplicate(vertexInterpolation(cube->getVertex(7), cube->getVertex(6)))
+		);
+		trianguleOfTheObjects.push_back(tri);
 	}
 }
 
@@ -477,4 +532,32 @@ void printAllNewVertices(){
 	for (int i = 0; i < length; ++i){
 		fprintf(GL_fl_DEBUG, "v %.2f %.2f %.2f\n", newVertices[i].getCoordinateX(), newVertices[i].getCoordinateY(), newVertices[i].getCoordinateZ());
 	}
+}
+
+void printAllTriangules(){
+	int count = trianguleOfTheObjects.size();
+	VertexOfTheObject *tmp;
+	for (int i = 0; i < count; ++i){
+		tmp = trianguleOfTheObjects[i].getCoordinates();
+		fprintf(GL_fl_DEBUG, "f %d %d %d\n", tmp[0].getId(), tmp[1].getId(), tmp[2].getId());	
+	}
+}
+
+void printOBJ(){
+	FILE *MALHA;
+	int count = trianguleOfTheObjects.size();
+	VertexOfTheObject *tmp;
+
+	MALHA = fopen(OUTPUT, "w+" );
+
+	for (int i = 0; i < count; ++i){
+		fprintf(MALHA, "v %.2f %.2f %.2f\n", newVertices[i].getCoordinateX(), newVertices[i].getCoordinateY(), newVertices[i].getCoordinateZ());
+	}
+
+	for (int i = 0; i < count; ++i){
+		tmp = trianguleOfTheObjects[i].getCoordinates();
+		fprintf(MALHA, "f %d %d %d\n", tmp[0].getId(), tmp[1].getId(), tmp[2].getId());	
+	}
+
+	fclose( MALHA );
 }
