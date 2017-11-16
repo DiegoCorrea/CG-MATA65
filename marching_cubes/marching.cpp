@@ -195,7 +195,9 @@ int convertBinaryToDecimal(long long n);
 void readFile(int argc, char *argv[]);
 void makeCubes();
 VertexOfTheObject vertexInterpolation(Vertex *origin, Vertex *master);
+VertexOfTheObject insertNotDuplicate(VertexOfTheObject vertex);
 void cubeInterpolation(Cube *cube);
+void printAllNewVertices();
 
 int main(int argc, char *argv[]){	
 	if (argc < 2){
@@ -214,6 +216,7 @@ int main(int argc, char *argv[]){
 	readFile(argc, argv);
 	makeCubes();
 
+	printAllNewVertices();
 	fclose( GL_fl_DEBUG );
 
 	return 0;
@@ -412,57 +415,66 @@ VertexOfTheObject vertexInterpolation(Vertex *origin, Vertex *master) {
 	return vertice;
 }
 
-VertexOfTheObject* insertNotDuplicate(VertexOfTheObject *vertex){
+VertexOfTheObject insertNotDuplicate(VertexOfTheObject vertex){
 	int length = newVertices.size();
 
 	for (int i = 0; i < length; ++i){
-		if ((vertex->getCoordinateX() == newVertices[i].getCoordinateX()) && (vertex->getCoordinateY() == newVertices[i].getCoordinateY()) && (vertex->getCoordinateZ() == newVertices[i].getCoordinateZ())) {
+		if ((vertex.getCoordinateX() == newVertices[i].getCoordinateX()) && (vertex.getCoordinateY() == newVertices[i].getCoordinateY()) && (vertex.getCoordinateZ() == newVertices[i].getCoordinateZ())) {
 			return newVertices[i];
 		}
 	}
-	newVertices.push_back(*vertex);
+	newVertices.push_back(vertex);
 
 	return vertex;
 }
 void cubeInterpolation(Cube *cube){
+	VertexOfTheObject vertex;
 	if(cube->getVertex(0)->isMarked() == TRUE ){
-		newVertices.push_back(vertexInterpolation(cube->getVertex(0), cube->getVertex(1)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(0), cube->getVertex(4)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(0), cube->getVertex(3)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(0), cube->getVertex(1)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(0), cube->getVertex(4)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(0), cube->getVertex(3)));
 	}
 	if(cube->getVertex(1)->isMarked() == TRUE ){
-		newVertices.push_back(vertexInterpolation(cube->getVertex(1), cube->getVertex(2)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(1), cube->getVertex(5)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(1), cube->getVertex(0)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(1), cube->getVertex(2)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(1), cube->getVertex(5)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(1), cube->getVertex(0)));
 	}
 	if(cube->getVertex(2)->isMarked() == TRUE ){
-		newVertices.push_back(vertexInterpolation(cube->getVertex(2), cube->getVertex(3)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(2), cube->getVertex(6)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(2), cube->getVertex(1)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(2), cube->getVertex(3)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(2), cube->getVertex(6)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(2), cube->getVertex(1)));
 	}
 	if(cube->getVertex(3)->isMarked() == TRUE ){
-		newVertices.push_back(vertexInterpolation(cube->getVertex(3), cube->getVertex(0)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(3), cube->getVertex(7)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(3), cube->getVertex(2)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(3), cube->getVertex(0)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(3), cube->getVertex(7)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(3), cube->getVertex(2)));
 	}
 	if(cube->getVertex(4)->isMarked() == TRUE ){
-		newVertices.push_back(vertexInterpolation(cube->getVertex(4), cube->getVertex(5)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(4), cube->getVertex(0)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(4), cube->getVertex(7)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(4), cube->getVertex(5)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(4), cube->getVertex(0)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(4), cube->getVertex(7)));
 	}
 	if(cube->getVertex(5)->isMarked() == TRUE ){
-		newVertices.push_back(vertexInterpolation(cube->getVertex(5), cube->getVertex(6)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(5), cube->getVertex(1)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(5), cube->getVertex(4)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(5), cube->getVertex(6)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(5), cube->getVertex(1)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(5), cube->getVertex(4)));
 	}
 	if(cube->getVertex(6)->isMarked() == TRUE ){
-		newVertices.push_back(vertexInterpolation(cube->getVertex(6), cube->getVertex(7)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(6), cube->getVertex(2)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(6), cube->getVertex(5)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(6), cube->getVertex(7)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(6), cube->getVertex(2)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(6), cube->getVertex(5)));
 	}
 	if(cube->getVertex(7)->isMarked() == TRUE ){
-		newVertices.push_back(vertexInterpolation(cube->getVertex(7), cube->getVertex(4)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(7), cube->getVertex(3)));
-		newVertices.push_back(vertexInterpolation(cube->getVertex(7), cube->getVertex(6)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(7), cube->getVertex(4)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(7), cube->getVertex(3)));
+		vertex = insertNotDuplicate(vertexInterpolation(cube->getVertex(7), cube->getVertex(6)));
+	}
+}
+
+void printAllNewVertices(){
+	int length = newVertices.size();
+
+	for (int i = 0; i < length; ++i){
+		fprintf(GL_fl_DEBUG, "v %.2f %.2f %.2f\n", newVertices[i].getCoordinateX(), newVertices[i].getCoordinateY(), newVertices[i].getCoordinateZ());
 	}
 }
