@@ -13,6 +13,8 @@ using namespace std;
 # include <math.h>
 
 # define DEBUG 1
+# define TRUE 1
+# define FALSE 0
 # define LUTLINES 256
 # define LUTCOLUMN 16
 
@@ -33,6 +35,7 @@ class Vertex{
       this->coordinateZ = z;
       this->value = value;
     }
+
     Vertex(int x, int y, int z, int value, int id){
       this->coordinateX = x;
       this->coordinateY = y;
@@ -40,7 +43,10 @@ class Vertex{
       this->value = value;
       this->id = id;
     }
-    ~Vertex(){};
+
+    Vertex(){ };
+
+    ~Vertex(){ };
 
     int getCoordinateX(){
       return this->coordinateX;
@@ -60,23 +66,86 @@ class Vertex{
 
     int isMarked(){
     	if (this->value > 0) {
-    		return 1;
+    		return TRUE;
     	}
-    	return 0;
+    	return FALSE;
     }
 
-    int getID(){
+    int getId(){
     	return this->id;
     }
 };
+vector<vector<vector<Vertex> > > spaceVertices;
 
-vector<vector<vector<Vertex> > > cubeVertices;
+class Cube {
+	private:
+		Vertex *vertices[8];
+		int binaryConfig[8];
+		int decimalConfig;
+		int id;
+	public:
+		Cube(int x, int y, int z, int id){
+			this->vertices[0] = &spaceVertices[z][y][x];
+			this->vertices[1] = &spaceVertices[z][y][x+1];
+			this->vertices[2] = &spaceVertices[z+1][y][x+1];
+			this->vertices[3] = &spaceVertices[z+1][y][x];
+			this->vertices[4] = &spaceVertices[z][y+1][x];
+			this->vertices[5] = &spaceVertices[z][y+1][x+1];
+			this->vertices[6] = &spaceVertices[z+1][y+1][x+1];
+			this->vertices[7] = &spaceVertices[z+1][y+1][x];
+
+			this->id = id;
+		}
+
+		~Cube(){ };
+
+		Vertex* getVertex(int position){
+			return this->vertices[position];
+		}
+
+		void setBinaryConfig(int vec[8]){
+			for (int i = 0; i < 8; ++i){
+				this->binaryConfig[i] = vec[i];
+			}
+		}
+
+		void setDecimalConfig(int dec){
+			this->decimalConfig = dec;
+		}
+
+		int getDecimalConfig(){
+			return this->decimalConfig;
+		}
+
+		int getId(){
+			return this->id;
+		}
+
+		void printVerteces(){
+			fprintf(GL_fl_DEBUG, "\n[printVerteces] - Cubo %d - Possui a configuração: %d\n", this->id, this->decimalConfig);
+			fprintf(GL_fl_DEBUG, "[printVerteces] - Vertices usados: ");
+			for(int j = 0; j < LUTCOLUMN; j++){
+				fprintf(GL_fl_DEBUG, "%d ", LUT[decimalConfig][j]);
+  		}
+			fprintf(GL_fl_DEBUG, "\n");
+			fprintf(GL_fl_DEBUG, "[printVerteces] - Vertice 0: Global ID %d \t(%d, %d, %d) : Valor %d\n", this->vertices[0]->getId() ,this->vertices[0]->getCoordinateX(), this->vertices[0]->getCoordinateY(), this->vertices[0]->getCoordinateZ(), this->vertices[0]->getValue());
+			fprintf(GL_fl_DEBUG, "[printVerteces] - Vertice 1: Global ID %d \t(%d, %d, %d) : Valor %d\n", this->vertices[1]->getId() ,this->vertices[1]->getCoordinateX(), this->vertices[1]->getCoordinateY(), this->vertices[1]->getCoordinateZ(), this->vertices[1]->getValue());
+			fprintf(GL_fl_DEBUG, "[printVerteces] - Vertice 2: Global ID %d \t(%d, %d, %d) : Valor %d\n", this->vertices[2]->getId() ,this->vertices[2]->getCoordinateX(), this->vertices[2]->getCoordinateY(), this->vertices[2]->getCoordinateZ(), this->vertices[2]->getValue());
+			fprintf(GL_fl_DEBUG, "[printVerteces] - Vertice 3: Global ID %d \t(%d, %d, %d) : Valor %d\n", this->vertices[3]->getId() ,this->vertices[3]->getCoordinateX(), this->vertices[3]->getCoordinateY(), this->vertices[3]->getCoordinateZ(), this->vertices[3]->getValue());
+			fprintf(GL_fl_DEBUG, "[printVerteces] - Vertice 4: Global ID %d \t(%d, %d, %d) : Valor %d\n", this->vertices[4]->getId() ,this->vertices[4]->getCoordinateX(), this->vertices[4]->getCoordinateY(), this->vertices[4]->getCoordinateZ(), this->vertices[4]->getValue());
+			fprintf(GL_fl_DEBUG, "[printVerteces] - Vertice 5: Global ID %d \t(%d, %d, %d) : Valor %d\n", this->vertices[5]->getId() ,this->vertices[5]->getCoordinateX(), this->vertices[5]->getCoordinateY(), this->vertices[5]->getCoordinateZ(), this->vertices[5]->getValue());
+			fprintf(GL_fl_DEBUG, "[printVerteces] - Vertice 6: Global ID %d \t(%d, %d, %d) : Valor %d\n", this->vertices[6]->getId() ,this->vertices[6]->getCoordinateX(), this->vertices[6]->getCoordinateY(), this->vertices[6]->getCoordinateZ(), this->vertices[6]->getValue());
+			fprintf(GL_fl_DEBUG, "[printVerteces] - Vertice 7: Global ID %d \t(%d, %d, %d) : Valor %d\n", this->vertices[7]->getId() ,this->vertices[7]->getCoordinateX(), this->vertices[7]->getCoordinateY(), this->vertices[7]->getCoordinateZ(), this->vertices[7]->getValue());
+		}
+};
+vector<Cube> spaceCubes;
 
 void allVertex();
 int convertBinaryToDecimal(long long n);
 void readFile(int argc, char *argv[]);
 void makeCubes();
-Vertex vertexInterpolation(Vertex origin, Vertex master);
+Vertex vertexInterpolation(Vertex *origin, Vertex *master);
+void cubeInterpolation(Cube *cube);
 
 int main(int argc, char *argv[]){	
 	if (argc < 2){
@@ -95,14 +164,6 @@ int main(int argc, char *argv[]){
 	readFile(argc, argv);
 	makeCubes();
 
-	Vertex v = vertexInterpolation(cubeVertices[0][1][1], cubeVertices[1][1][1]);
-
-	// <DEBUG>
-	if (DEBUG == 1){
-		fprintf(GL_fl_DEBUG, "[main] - Vertice %d e %d\n", cubeVertices[0][1][1].getValue(), cubeVertices[1][1][1].getValue());
-		fprintf(GL_fl_DEBUG, "[main] - Valor do novo vertice %d\n", v.getValue());
-		fprintf(GL_fl_DEBUG, "[main] - Finalizando Programa\n");
-	} // </DEBUG>
 	fclose( GL_fl_DEBUG );
 
 	return 0;
@@ -113,7 +174,7 @@ void allVertex() {
 	for(int x = 0; x < planSize; x++){
 		for(int y = 0; y < planSize; y++){
 			for(int z = 0; z < planSize; z++){
-				fprintf(GL_fl_DEBUG, "[GRID] - (%d, %d, %d) - Status %d\n", cubeVertices[z][y][x].getCoordinateX(), cubeVertices[z][y][x].getCoordinateY(), cubeVertices[z][y][x].getCoordinateZ(), cubeVertices[z][y][x].getValue());
+				fprintf(GL_fl_DEBUG, "[GRID] - (%d, %d, %d) - Status %d\n", spaceVertices[z][y][x].getCoordinateX(), spaceVertices[z][y][x].getCoordinateY(), spaceVertices[z][y][x].getCoordinateZ(), spaceVertices[z][y][x].getValue());
 			}
 		}
 	}
@@ -152,18 +213,19 @@ void readFile(int argc, char *argv[]){
 
 	fscanf(fl_input, "%d", &planSize);
 	int v[planSize][planSize][planSize];
+	int vertexCounter = 0;
 
 	for(int z = 0; z < planSize; z++){
 		vector < vector < Vertex > > d2;
-		cubeVertices.push_back( d2 );
+		spaceVertices.push_back( d2 );
 		for(int y = 0; y < planSize; y++) {
 			vector <Vertex> d3;
-      cubeVertices[z].push_back( d3 );
-			for (int x = 0; x < planSize; ++x) {
+      spaceVertices[z].push_back( d3 );
+			for (int x = 0; x < planSize; ++x, vertexCounter++) {
 				fscanf(fl_input, "%d", &v[z][y][x]);
 
-				Vertex vertice(x,y,z,v[z][y][x]);
-        cubeVertices[z][y].push_back(vertice);
+				Vertex vertice(x,y,z,v[z][y][x],vertexCounter);
+        spaceVertices[z][y].push_back(vertice);
 			}
 		}
 	}
@@ -219,39 +281,30 @@ void makeCubes(){
 		fprintf(GL_fl_DEBUG, "[makeCubes] --- Iniciando Produção dos Cubos\n");
 	}// </DEBUG>
 
-	for(int z = 0, cb = 0; z < planSize-1; z++){
+	for(int z = 0, cubesCounter = 0; z < planSize-1; z++){
 		for(int y = 0; y < planSize-1; y++ ) {
-			for(int x = 0; x < planSize-1; x++){
+			for(int x = 0; x < planSize-1; x++, cubesCounter++){
 				int id = 0;
-				cb += 1;
 
-				binaryConfig[0] = cubeVertices[z+1][y+1][x].isMarked();
-				binaryConfig[1] = cubeVertices[z+1][y+1][x+1].isMarked();
-				binaryConfig[2] = cubeVertices[z][y+1][x+1].isMarked();
-				binaryConfig[3] = cubeVertices[z][y+1][x].isMarked();
-				binaryConfig[4] = cubeVertices[z+1][y][x].isMarked();
-				binaryConfig[5] = cubeVertices[z+1][y][x+1].isMarked();
-				binaryConfig[6] = cubeVertices[z][y][x+1].isMarked();
-				binaryConfig[7] = cubeVertices[z][y][x].isMarked();
+				binaryConfig[0] = spaceVertices[z+1][y+1][x].isMarked();
+				binaryConfig[1] = spaceVertices[z+1][y+1][x+1].isMarked();
+				binaryConfig[2] = spaceVertices[z][y+1][x+1].isMarked();
+				binaryConfig[3] = spaceVertices[z][y+1][x].isMarked();
+				binaryConfig[4] = spaceVertices[z+1][y][x].isMarked();
+				binaryConfig[5] = spaceVertices[z+1][y][x+1].isMarked();
+				binaryConfig[6] = spaceVertices[z][y][x+1].isMarked();
+				binaryConfig[7] = spaceVertices[z][y][x].isMarked();
 
 				decimalConfig = convertBinaryToDecimal(makeBinary(binaryConfig));
+				Cube cube(x, y, z, cubesCounter);
+				cube.setDecimalConfig(decimalConfig);
+				cube.setBinaryConfig(binaryConfig);
+				spaceCubes.push_back(cube);
+				cubeInterpolation(&cube);
 
 				// <DEBUG>
 				if (DEBUG == 1){
-					fprintf(GL_fl_DEBUG, "\n[makeCubes] - Cubo %d - Possui a configuração: %d\n", cb,decimalConfig);
-					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertices usados: ");
-					for(int j = 0; j < LUTCOLUMN; j++){
-						fprintf(GL_fl_DEBUG, "%d ", LUT[decimalConfig][j]);
-	    		}
-	    		fprintf(GL_fl_DEBUG, "\n");
-					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 1: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x, y, z, cubeVertices[z][y][x].getCoordinateX(), cubeVertices[z][y][x].getCoordinateY(), cubeVertices[z][y][x].getCoordinateZ(), cubeVertices[z][y][x].getValue());
-					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 2: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x+1, y, z, cubeVertices[z][y][x+1].getCoordinateX(), cubeVertices[z][y][x+1].getCoordinateY(), cubeVertices[z][y][x+1].getCoordinateZ(), cubeVertices[z][y][x+1].getValue());
-					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 3: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x+1, y, z+1, cubeVertices[z+1][y][x+1].getCoordinateX(), cubeVertices[z+1][y][x+1].getCoordinateY(), cubeVertices[z+1][y][x+1].getCoordinateZ(), cubeVertices[z+1][y][x+1].getValue());
-					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 4: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x, y, z+1, cubeVertices[z+1][y][x].getCoordinateX(), cubeVertices[z+1][y][x].getCoordinateY(), cubeVertices[z+1][y][x].getCoordinateZ(), cubeVertices[z+1][y][x].getValue());
-					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 5: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x, y+1, z, cubeVertices[z][y+1][x].getCoordinateX(), cubeVertices[z][y+1][x].getCoordinateY(), cubeVertices[z][y+1][x].getCoordinateZ(), cubeVertices[z][y+1][x].getValue());
-					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 6: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x+1, y+1, z, cubeVertices[z][y+1][x+1].getCoordinateX(), cubeVertices[z][y+1][x+1].getCoordinateY(), cubeVertices[z][y+1][x+1].getCoordinateZ(), cubeVertices[z][y+1][x+1].getValue());
-					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 7: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x+1, y+1, z+1, cubeVertices[z+1][y+1][x+1].getCoordinateX(), cubeVertices[z+1][y+1][x+1].getCoordinateY(), cubeVertices[z+1][y+1][x+1].getCoordinateZ(), cubeVertices[z+1][y+1][x+1].getValue());
-					fprintf(GL_fl_DEBUG, "[makeCubes] - Vertice 8: (%d, %d, %d)  | |  (%d, %d, %d) : status %d\n", x, y+1, z+1, cubeVertices[z+1][y+1][x].getCoordinateX(), cubeVertices[z+1][y+1][x].getCoordinateY(), cubeVertices[z+1][y+1][x].getCoordinateZ(), cubeVertices[z+1][y+1][x].getValue());
+	    		cube.printVerteces();
 
 					fprintf(GL_fl_DEBUG, "\n");
 					fprintf(GL_fl_DEBUG, "[makeCubes] - Reconhecendo Arestas\n");
@@ -280,7 +333,6 @@ void makeCubes(){
 					fprintf(GL_fl_DEBUG, "[makeCubes] - De (%d, %d, %d) para (%d, %d, %d) ID: %d\n", x,y,z+1, x,y+1,z+1, id);
 					id++;
 
-
 					fprintf(GL_fl_DEBUG, "-------------------------------------------------------------------------------\n");
 				} // </DEBUG>
 			}
@@ -288,25 +340,76 @@ void makeCubes(){
 	}
 }
 
-Vertex vertexInterpolation(Vertex origin, Vertex master) {
+Vertex vertexInterpolation(Vertex *origin, Vertex *master) {
 	float x = 0, y = 0, z = 0, point;
 
-	float p1 = (std::abs(isoValue - master.getValue()) / std::abs(master.getValue() - origin.getValue()));
-	x = origin.getCoordinateX() * p1;
-	y = origin.getCoordinateY() * p1;
-	z = origin.getCoordinateZ() * p1;
+	float p1 = (std::abs(isoValue - master->getValue()) / std::abs(master->getValue() - origin->getValue()));
+	x = origin->getCoordinateX() * p1;
+	y = origin->getCoordinateY() * p1;
+	z = origin->getCoordinateZ() * p1;
 
-	float p2 = (std::abs(isoValue - origin.getValue()) / std::abs(master.getValue() - origin.getValue()));
+	float p2 = (std::abs(isoValue - origin->getValue()) / std::abs(master->getValue() - origin->getValue()));
 
-	x += (master.getCoordinateX() * p2);
-	y += (master.getCoordinateY() * p2);
-	z += (master.getCoordinateZ() * p2);
+	x += (master->getCoordinateX() * p2);
+	y += (master->getCoordinateY() * p2);
+	z += (master->getCoordinateZ() * p2);
 	// <DEBUG>
 	if (DEBUG == 1){
-		fprintf(GL_fl_DEBUG, "\n\n[vertexInterpolation] - Novo vertice: (%f, %f, %f)\n", x, y, z);
-		fprintf(GL_fl_DEBUG, "\n\n");
+		fprintf(GL_fl_DEBUG, "\n[vertexInterpolation] - Novo vertice: (%f, %f, %f)\n", x, y, z);
 	} // </DEBUG>
 
 	Vertex vertice(x,y,z,isoValue);
 	return vertice;
+}
+
+void cubeInterpolation(Cube *cube){
+	Vertex neibh;
+	if(cube->getVertex(0)->isMarked() == TRUE ){
+		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 0\n");
+		neibh = vertexInterpolation(cube->getVertex(0), cube->getVertex(1));
+		neibh = vertexInterpolation(cube->getVertex(0), cube->getVertex(4));
+		neibh = vertexInterpolation(cube->getVertex(0), cube->getVertex(3));
+	}
+	if(cube->getVertex(1)->isMarked() == TRUE ){
+		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 1\n");
+		neibh = vertexInterpolation(cube->getVertex(1), cube->getVertex(2));
+		neibh = vertexInterpolation(cube->getVertex(1), cube->getVertex(5));
+		neibh = vertexInterpolation(cube->getVertex(1), cube->getVertex(0));
+	}
+	if(cube->getVertex(2)->isMarked() == TRUE ){
+		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 2\n");
+		neibh = vertexInterpolation(cube->getVertex(2), cube->getVertex(3));
+		neibh = vertexInterpolation(cube->getVertex(2), cube->getVertex(6));
+		neibh = vertexInterpolation(cube->getVertex(2), cube->getVertex(1));
+	}
+	if(cube->getVertex(3)->isMarked() == TRUE ){
+		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 3\n");
+		neibh = vertexInterpolation(cube->getVertex(3), cube->getVertex(0));
+		neibh = vertexInterpolation(cube->getVertex(3), cube->getVertex(7));
+		neibh = vertexInterpolation(cube->getVertex(3), cube->getVertex(2));
+	}
+	if(cube->getVertex(4)->isMarked() == TRUE ){
+		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 4\n");
+		neibh = vertexInterpolation(cube->getVertex(4), cube->getVertex(5));
+		neibh = vertexInterpolation(cube->getVertex(4), cube->getVertex(0));
+		neibh = vertexInterpolation(cube->getVertex(4), cube->getVertex(7));
+	}
+	if(cube->getVertex(5)->isMarked() == TRUE ){
+		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 5\n");
+		neibh = vertexInterpolation(cube->getVertex(5), cube->getVertex(6));
+		neibh = vertexInterpolation(cube->getVertex(5), cube->getVertex(1));
+		neibh = vertexInterpolation(cube->getVertex(5), cube->getVertex(4));
+	}
+	if(cube->getVertex(6)->isMarked() == TRUE ){
+		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 6\n");
+		neibh = vertexInterpolation(cube->getVertex(6), cube->getVertex(7));
+		neibh = vertexInterpolation(cube->getVertex(6), cube->getVertex(2));
+		neibh = vertexInterpolation(cube->getVertex(6), cube->getVertex(5));
+	}
+	if(cube->getVertex(7)->isMarked() == TRUE ){
+		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 7\n");
+		neibh = vertexInterpolation(cube->getVertex(7), cube->getVertex(4));
+		neibh = vertexInterpolation(cube->getVertex(7), cube->getVertex(3));
+		neibh = vertexInterpolation(cube->getVertex(7), cube->getVertex(6));
+	}
 }
