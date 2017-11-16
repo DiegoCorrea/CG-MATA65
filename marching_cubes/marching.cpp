@@ -77,6 +77,56 @@ class Vertex{
 };
 vector<vector<vector<Vertex> > > spaceVertices;
 
+class VertexOfTheObject{
+  private:
+  	float coordinateX, coordinateY, coordinateZ;
+  	float value;
+  	int id;
+
+  public:
+    VertexOfTheObject(float x, float y, float z, float value){
+      this->coordinateX = x;
+      this->coordinateY = y;
+      this->coordinateZ = z;
+      this->value = value;
+    }
+
+    VertexOfTheObject(float x, float y, float z, float value, int id){
+      this->coordinateX = x;
+      this->coordinateY = y;
+      this->coordinateZ = z;
+      this->value = value;
+      this->id = id;
+    }
+
+    VertexOfTheObject(){ };
+
+    ~VertexOfTheObject(){ };
+
+    float getCoordinateX(){
+      return this->coordinateX;
+    }
+
+    float getCoordinateY(){
+      return this->coordinateY;
+    }
+
+    float getCoordinateZ(){
+      return this->coordinateZ;
+    }
+
+    float getValue(){
+    	return this->value;
+    }
+
+    int getId(){
+    	return this->id;
+    }	
+};
+std::vector<VertexOfTheObject> newVertices;
+
+
+
 class Cube {
 	private:
 		Vertex *vertices[8];
@@ -144,7 +194,7 @@ void allVertex();
 int convertBinaryToDecimal(long long n);
 void readFile(int argc, char *argv[]);
 void makeCubes();
-Vertex vertexInterpolation(Vertex *origin, Vertex *master);
+VertexOfTheObject vertexInterpolation(Vertex *origin, Vertex *master);
 void cubeInterpolation(Cube *cube);
 
 int main(int argc, char *argv[]){	
@@ -340,7 +390,7 @@ void makeCubes(){
 	}
 }
 
-Vertex vertexInterpolation(Vertex *origin, Vertex *master) {
+VertexOfTheObject vertexInterpolation(Vertex *origin, Vertex *master) {
 	float x = 0, y = 0, z = 0, point;
 
 	float p1 = (std::abs(isoValue - master->getValue()) / std::abs(master->getValue() - origin->getValue()));
@@ -358,58 +408,61 @@ Vertex vertexInterpolation(Vertex *origin, Vertex *master) {
 		fprintf(GL_fl_DEBUG, "\n[vertexInterpolation] - Novo vertice: (%f, %f, %f)\n", x, y, z);
 	} // </DEBUG>
 
-	Vertex vertice(x,y,z,isoValue);
+	VertexOfTheObject vertice(x,y,z,isoValue);
 	return vertice;
 }
 
+VertexOfTheObject* insertNotDuplicate(VertexOfTheObject *vertex){
+	int length = newVertices.size();
+
+	for (int i = 0; i < length; ++i){
+		if ((vertex->getCoordinateX() == newVertices[i].getCoordinateX()) && (vertex->getCoordinateY() == newVertices[i].getCoordinateY()) && (vertex->getCoordinateZ() == newVertices[i].getCoordinateZ())) {
+			return newVertices[i];
+		}
+	}
+	newVertices.push_back(*vertex);
+
+	return vertex;
+}
 void cubeInterpolation(Cube *cube){
-	Vertex neibh;
 	if(cube->getVertex(0)->isMarked() == TRUE ){
-		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 0\n");
-		neibh = vertexInterpolation(cube->getVertex(0), cube->getVertex(1));
-		neibh = vertexInterpolation(cube->getVertex(0), cube->getVertex(4));
-		neibh = vertexInterpolation(cube->getVertex(0), cube->getVertex(3));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(0), cube->getVertex(1)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(0), cube->getVertex(4)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(0), cube->getVertex(3)));
 	}
 	if(cube->getVertex(1)->isMarked() == TRUE ){
-		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 1\n");
-		neibh = vertexInterpolation(cube->getVertex(1), cube->getVertex(2));
-		neibh = vertexInterpolation(cube->getVertex(1), cube->getVertex(5));
-		neibh = vertexInterpolation(cube->getVertex(1), cube->getVertex(0));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(1), cube->getVertex(2)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(1), cube->getVertex(5)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(1), cube->getVertex(0)));
 	}
 	if(cube->getVertex(2)->isMarked() == TRUE ){
-		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 2\n");
-		neibh = vertexInterpolation(cube->getVertex(2), cube->getVertex(3));
-		neibh = vertexInterpolation(cube->getVertex(2), cube->getVertex(6));
-		neibh = vertexInterpolation(cube->getVertex(2), cube->getVertex(1));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(2), cube->getVertex(3)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(2), cube->getVertex(6)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(2), cube->getVertex(1)));
 	}
 	if(cube->getVertex(3)->isMarked() == TRUE ){
-		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 3\n");
-		neibh = vertexInterpolation(cube->getVertex(3), cube->getVertex(0));
-		neibh = vertexInterpolation(cube->getVertex(3), cube->getVertex(7));
-		neibh = vertexInterpolation(cube->getVertex(3), cube->getVertex(2));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(3), cube->getVertex(0)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(3), cube->getVertex(7)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(3), cube->getVertex(2)));
 	}
 	if(cube->getVertex(4)->isMarked() == TRUE ){
-		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 4\n");
-		neibh = vertexInterpolation(cube->getVertex(4), cube->getVertex(5));
-		neibh = vertexInterpolation(cube->getVertex(4), cube->getVertex(0));
-		neibh = vertexInterpolation(cube->getVertex(4), cube->getVertex(7));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(4), cube->getVertex(5)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(4), cube->getVertex(0)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(4), cube->getVertex(7)));
 	}
 	if(cube->getVertex(5)->isMarked() == TRUE ){
-		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 5\n");
-		neibh = vertexInterpolation(cube->getVertex(5), cube->getVertex(6));
-		neibh = vertexInterpolation(cube->getVertex(5), cube->getVertex(1));
-		neibh = vertexInterpolation(cube->getVertex(5), cube->getVertex(4));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(5), cube->getVertex(6)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(5), cube->getVertex(1)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(5), cube->getVertex(4)));
 	}
 	if(cube->getVertex(6)->isMarked() == TRUE ){
-		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 6\n");
-		neibh = vertexInterpolation(cube->getVertex(6), cube->getVertex(7));
-		neibh = vertexInterpolation(cube->getVertex(6), cube->getVertex(2));
-		neibh = vertexInterpolation(cube->getVertex(6), cube->getVertex(5));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(6), cube->getVertex(7)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(6), cube->getVertex(2)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(6), cube->getVertex(5)));
 	}
 	if(cube->getVertex(7)->isMarked() == TRUE ){
-		fprintf(GL_fl_DEBUG, "\n[Cube Interpolation] - vertice: 7\n");
-		neibh = vertexInterpolation(cube->getVertex(7), cube->getVertex(4));
-		neibh = vertexInterpolation(cube->getVertex(7), cube->getVertex(3));
-		neibh = vertexInterpolation(cube->getVertex(7), cube->getVertex(6));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(7), cube->getVertex(4)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(7), cube->getVertex(3)));
+		newVertices.push_back(vertexInterpolation(cube->getVertex(7), cube->getVertex(6)));
 	}
 }
