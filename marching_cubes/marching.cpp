@@ -426,14 +426,29 @@ void makeCubes(){
 
 VertexOfTheObject vertexInterpolation(Vertex *origin, Vertex *master) {
 	float x = 0, y = 0, z = 0, point;
+	float dm, dt, p1, p2;
 
-	float p1 = (std::abs(isoValue - master->getValue()) / std::abs(master->getValue() - origin->getValue()));
+	dm = std::abs(isoValue - master->getValue());
+	dt = std::abs(master->getValue() - origin->getValue());
+	if (dm == 0 || dt ==0 ){
+		p1 = 0;	
+	}
+	else {
+		p1 = (dm / dt);
+	}
 	x = origin->getCoordinateX() * p1;
 	y = origin->getCoordinateY() * p1;
 	z = origin->getCoordinateZ() * p1;
 
-	float p2 = (std::abs(isoValue - origin->getValue()) / std::abs(master->getValue() - origin->getValue()));
 
+	dm = std::abs(isoValue - origin->getValue());
+	dt = std::abs(master->getValue() - origin->getValue());
+	if (dm == 0 || dt ==0 ){
+		p2 = 0;	
+	}
+	else {
+		p2 = (dm / dt);
+	}
 	x += (master->getCoordinateX() * p2);
 	y += (master->getCoordinateY() * p2);
 	z += (master->getCoordinateZ() * p2);
