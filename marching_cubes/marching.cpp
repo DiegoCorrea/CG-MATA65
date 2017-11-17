@@ -20,7 +20,7 @@ using namespace std;
 # define OUTPUT "malha.obj"
 
 FILE *GL_fl_DEBUG;
-int LUT[LUTLINES][LUTCOLUMN];
+int LUT[LUTLINES][LUTCOLUMN+1] = { -1 };
 int planSize;
 float isoValue;
 
@@ -221,6 +221,8 @@ void makeCubes();
 VertexOfTheObject vertexInterpolation(Vertex *origin, Vertex *master);
 VertexOfTheObject insertNotDuplicate(VertexOfTheObject vertex);
 void cubeInterpolation(Cube *cube);
+VertexOfTheObject edgeVertices(Cube *cube, int edge);
+void cubeInter(Cube *cube);
 void printAllNewVertices();
 void printAllTriangules();
 void printOBJ();
@@ -384,7 +386,7 @@ void makeCubes(){
 				cube.setDecimalConfig(decimalConfig);
 				cube.setBinaryConfig(binaryConfig);
 				spaceCubes.push_back(cube);
-				cubeInterpolation(&cube);
+				cubeInter(&cube);
 
 				// <DEBUG>
 				if (DEBUG == 1){
@@ -443,7 +445,7 @@ VertexOfTheObject vertexInterpolation(Vertex *origin, Vertex *master) {
 
 	dm = std::abs(isoValue - origin->getValue());
 	dt = std::abs(master->getValue() - origin->getValue());
-	if (dm == 0 || dt ==0 ){
+	if (dm == 0 || dt ==0){
 		p2 = 0;	
 	}
 	else {
@@ -474,6 +476,62 @@ VertexOfTheObject insertNotDuplicate(VertexOfTheObject vertex){
 
 	return vertex;
 }
+
+VertexOfTheObject edgeVertices(Cube *cube, int edge) {
+	switch(edge){
+		case 0:
+			return vertexInterpolation(cube->getVertex(0), cube->getVertex(1));
+		break;
+		case 1:
+			return vertexInterpolation(cube->getVertex(1), cube->getVertex(2));
+		break;
+		case 2:
+			return vertexInterpolation(cube->getVertex(2), cube->getVertex(3));
+		break;
+		case 3:
+			return vertexInterpolation(cube->getVertex(3), cube->getVertex(0));
+		break;
+		case 4:
+			return vertexInterpolation(cube->getVertex(4), cube->getVertex(5));
+		break;
+		case 5:
+			return vertexInterpolation(cube->getVertex(5), cube->getVertex(6));
+		break;
+		case 6:
+			return vertexInterpolation(cube->getVertex(6), cube->getVertex(7));
+		break;
+		case 7:
+			return vertexInterpolation(cube->getVertex(7), cube->getVertex(4));
+		break;
+		case 8:
+			return vertexInterpolation(cube->getVertex(4), cube->getVertex(0));
+		break;
+		case 9:
+			return vertexInterpolation(cube->getVertex(5), cube->getVertex(1));
+		break;
+		case 10:
+			return vertexInterpolation(cube->getVertex(6), cube->getVertex(2));
+		break;
+		case 11:
+			return vertexInterpolation(cube->getVertex(7), cube->getVertex(3));
+		break;
+		default:
+			printf("FUDEUUUUUUUUUUUUUUUUUUUUUUUUUUU... ARESTA ÑÃO EXISTE\n");
+	}
+}
+
+void cubeInter(Cube *cube){
+	int edge = LUT[cube->getDecimalConfig()][0];
+	for(int j = 0; j < 16 && edge != -1; j += 3, edge = LUT[cube->getDecimalConfig()][j]){
+		Triangule tri(
+			insertNotDuplicate((edgeVertices(cube, LUT[cube->getDecimalConfig()][j]))),
+			insertNotDuplicate((edgeVertices(cube, LUT[cube->getDecimalConfig()][j+1]))),
+			insertNotDuplicate((edgeVertices(cube, LUT[cube->getDecimalConfig()][j+2])))
+		);
+		trianguleOfTheObjects.push_back(tri);
+  }
+}
+
 void cubeInterpolation(Cube *cube){
 	VertexOfTheObject vertex;
 	if(cube->getVertex(0)->isMarked() == TRUE ){
@@ -559,20 +617,20 @@ void printAllTriangules(){
 }
 
 void printOBJ(){
-	FILE *MALHA;
+	FILE *fl_MALHA;
 	int count = trianguleOfTheObjects.size();
 	VertexOfTheObject *tmp;
 
-	MALHA = fopen(OUTPUT, "w+" );
+	fl_MALHA = fopen(OUTPUT, "w+" );
 
 	for (int i = 0; i < count; ++i){
-		fprintf(MALHA, "v %.2f %.2f %.2f\n", newVertices[i].getCoordinateX(), newVertices[i].getCoordinateY(), newVertices[i].getCoordinateZ());
+		fprintf(fl_MALHA, "v %.2f %.2f %.2f\n", newVertices[i].getCoordinateX(), newVertices[i].getCoordinateY(), newVertices[i].getCoordinateZ());
 	}
 
 	for (int i = 0; i < count; ++i){
 		tmp = trianguleOfTheObjects[i].getCoordinates();
-		fprintf(MALHA, "f %d %d %d\n", tmp[0].getId(), tmp[1].getId(), tmp[2].getId());	
+		fprintf(fl_MALHA, "f %d %d %d\n", tmp[0].getId(), tmp[1].getId(), tmp[2].getId());	
 	}
 
-	fclose( MALHA );
+	fclose( fl_MALHA );
 }
