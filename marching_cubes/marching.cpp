@@ -12,7 +12,7 @@ using namespace std;
 # include <stdio.h>
 # include <math.h>
 
-# define DEBUG 1
+# define DEBUG 0
 # define TRUE 1
 # define FALSE 0
 # define LUTLINES 256
@@ -233,10 +233,9 @@ int main(int argc, char *argv[]){
 		printf("O Marching Cubes será fechado!\n");
 		return 1;
 	}
-
-	GL_fl_DEBUG = fopen("marchingDEBUG.log", "w+" );
 	// <DEBUG>
 	if (DEBUG == 1){
+		GL_fl_DEBUG = fopen("marchingDEBUG.log", "w+" );
 		fprintf(GL_fl_DEBUG, "[main] - Iniciando Programa\n");
 	} // </DEBUG>
 
@@ -244,13 +243,12 @@ int main(int argc, char *argv[]){
 	readFile(argc, argv);
 	makeCubes();
 
-	printAllNewVertices();
-
-	printAllTriangules();
-
 	printOBJ();
 
-	fclose( GL_fl_DEBUG );
+	// <DEBUG>
+	if (DEBUG == 1){
+		fclose( GL_fl_DEBUG );
+	} // </DEBUG>
 
 	return 0;
 }
