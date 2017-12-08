@@ -1,2 +1,2 @@
 all: 
-	gcc -o imageRestoration imageRestoration.c -lglut -lGLU -lGL -lm
+	g++ -o imageRestoration imageRestoration.cpp -lglut -lGLU -lGL -lm
