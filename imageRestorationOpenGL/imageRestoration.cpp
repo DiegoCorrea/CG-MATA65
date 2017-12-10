@@ -45,22 +45,38 @@ float gaussianFunction(int distance, int factor) {
 }
 
 float normalizationFactor(int processPixelPosition) {
-	float result;
-	for(int i = 0; i < pixelWindowRange; i++) {
-		int processWindowPosition = i*3;
-		result += gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data[processPixelPosition] - data[processWindowPosition]), phiR);
-	}
+	float result = 0;
 
+	for(int line = -12; line <= 12; line += 3){
+		for(int column= -12; column <= 12; column += 3){
+			int processWindowPosition = (abs(line)*width)+column;
+
+			if (line < 0 && column < 0) {
+				processWindowPosition = processPixelPosition - processWindowPosition;
+			} else {
+				processWindowPosition = processPixelPosition + processWindowPosition;
+			}
+
+			if (processWindowPosition < 0 || processWindowPosition > imageSize){
+				result += 0;
+			} else {
+				result += gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data[processPixelPosition] - data[processWindowPosition]), phiR);
+			}
+		}
+	}
 	return result;
 }
 
 void bilateralFilter(){
 	newImageData = (unsigned char *)malloc(imageSize);
 
-	int i,j;
+	int j;
 
-	for(i = 0; i < imageSize ; i+=3){
-		int index = i*3;
+	for(int p = 0; p < width * height ; p++){
+		int index = p*3;
+		float Wp = normalizationFactor(index);
+		BF = 
+
 	}
 }
 
