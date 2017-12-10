@@ -19,12 +19,12 @@ unsigned int dataPos;       // Position in the file where the actual data begins
 unsigned int width, height; // Image width and height
 unsigned int imageSize;     // width*height*channels
 unsigned char* data;        // Actual RGB data
-unsigned char* data_histogram; // Actual RGB data
+unsigned char* newImageData; // Actual RGB data
 int grayLevel[256] = {0};
 
 const int phiS = 3;
 const int phiR = 8;
-const int pixelWindow = 9*9;
+const int pixelWindowRange = 9*9;
 
 float gaussianFunction(int distance, int factor) {
 	float eulerNumber = exp(-(pow(distance/(2*factor), 2.0)));
@@ -44,23 +44,22 @@ float gaussianFunction(int distance, int factor) {
 	return result;
 }
 
-float normalizationFactor(int pixelsPosition) {
-	float distanceBetweenCoordinates;
-	float distanceBetweenColors;
+float normalizationFactor(int processPixelPosition) {
 	float result;
-	for(int i = 0; i < pixelWindow; i++) {
-		result += gaussianFunction(abs(pixelsPosition - i), phiS) * gaussianFunction((data[pixelsPosition] - data[i]), phiR);
+	for(int i = 0; i < pixelWindowRange; i++) {
+		int processWindowPosition = i*3;
+		result += gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data[processPixelPosition] - data[processWindowPosition]), phiR);
 	}
 
 	return result;
 }
 
 void bilateralFilter(){
-	data_filter = (unsigned char *)malloc(imageSize);
+	newImageData = (unsigned char *)malloc(imageSize);
 
 	int i,j;
 
-	for(i = 0; i < width * height ; i++){
+	for(i = 0; i < imageSize ; i+=3){
 		int index = i*3;
 	}
 }

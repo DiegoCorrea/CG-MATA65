@@ -27,9 +27,9 @@ void filtering(){
     m3 = index-3;
     m4 = index;
     m5 = index+3;
-    m6 = index-(3*width-3);
-    m7 = index-(3*width);
-    m8 = index-(3*width+3);
+    m6 = index+(3*width-3);
+    m7 = index+(3*width);
+    m8 = index+(3*width+3);
 
     if (m0 > imageSize || m0 < 0)
       m0=m4;
