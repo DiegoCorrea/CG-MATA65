@@ -28,7 +28,6 @@ void histogram() {
   float z = 0.0;
   int grayLevel[256] = { 0 };
 	int totalGray = 0;
-	float pr[256] = { 0 };
 	float sk[256] = { 0 };
 
   for (int i = 0; i < imageSize; i += 3) {
@@ -37,8 +36,7 @@ void histogram() {
   }
 
   for (int i = 0; i < 256; ++i) {
-    pr[i] = (float)((float)grayLevel[i]/(float)totalGray);
-    z += pr[i];
+    z += (float)((float)grayLevel[i]/(float)totalGray);
     sk[i] = z*256;
   }
 
@@ -56,11 +54,7 @@ float gaussianFunction(int distance, int factor) {
 	
 	// <LOGGER>
 	if (LOGGER) {
-		fprintf(fl_LOGGER, "\n[gaussianFunction] - Iniciando\n");
-		fprintf(fl_LOGGER, "\t[gaussianFunction] - O Valor do numero de Euler: %f\n", eulerNumber);
-		fprintf(fl_LOGGER, "\t[gaussianFunction] - Valor da primeira parte: %f\n", firstPart);
-		fprintf(fl_LOGGER, "\t[gaussianFunction] - Resultado da função Gaugasiana: %f\n", result);
-		fprintf(fl_LOGGER, "[gaussianFunction] - Finalizando\n");
+		fprintf(fl_LOGGER, "[gaussianFunction] -> return %f\n", result);
 	} 
 	// </LOGGER>
 
@@ -69,26 +63,23 @@ float gaussianFunction(int distance, int factor) {
 
 float normalizationFactor(int processPixelPosition) {
 	float Wp = 0;
-	int linePosition = 0, columnPosition = 0, processWindowPosition = 0, distance = 0;
+	int processWindowPosition = 0;
 	// <LOGGER>
 	if (LOGGER) {
 		fprintf(fl_LOGGER, "\n[normalizationFactor] - Iniciando\n");
 	}
 	// </LOGGER>
-	for(int line = -4; line <= 4; line++) {
-		linePosition = line*3;
-		for(int column = -4; column <= 4; column++) {
-			columnPosition = column*3;
+	for(int linePosition = -12; linePosition <= 12; linePosition += 3) {
+		for(int columnPosition = -12; columnPosition <= 12; columnPosition += 3) {
 			// <LOGGER>
 			if (LOGGER) {
 				fprintf(fl_LOGGER, "\t[normalizationFactor] - X na matriz: %d || Y na matriz: %d\n", linePosition, columnPosition);
 			}
 			// </LOGGER>
 
-			distance = (linePosition*width) + columnPosition; // Calculando a distância 9 x 9
-			processWindowPosition = processPixelPosition + distance;
+			processWindowPosition = processPixelPosition + (linePosition*width) + columnPosition;
 
-			if (processWindowPosition < 0 || processWindowPosition > imageSize || (processWindowPosition - (abs(linePosition*width))) < 0  || (processWindowPosition + (abs(linePosition*width))) > imageSize) {
+			if (processWindowPosition < 0 || processWindowPosition > imageSize) {
 				// <LOGGER>
 				if (LOGGER) {
 					fprintf(fl_LOGGER, "\t[normalizationFactor] - Valor fora da imagem\n");
@@ -102,7 +93,7 @@ float normalizationFactor(int processPixelPosition) {
 	}
 	// <LOGGER>
 	if (LOGGER) {
-		fprintf(fl_LOGGER, "[normalizationFactor] - Finalizando\n");
+		fprintf(fl_LOGGER, "[normalizationFactor] - Finalizando -> return %f\n", Wp);
 	}
 	// </LOGGER>
 	return Wp;
@@ -110,25 +101,22 @@ float normalizationFactor(int processPixelPosition) {
 
 float bfNormalizationFactorWithExtra(int processPixelPosition) {
 	float result = 0;
-	int linePosition = 0, columnPosition = 0, processWindowPosition = 0, distance = 0;
+	int processWindowPosition = 0;
 	// <LOGGER>
 	if (LOGGER) {
 		fprintf(fl_LOGGER, "\n[bfNormalizationFactorWithExtra] - Iniciando\n");
 	}
 	// </LOGGER>
-	for(int line = -4; line <= 4; line++) {
-		linePosition = line*3;
-		for(int column = -4; column <= 4; column++) {
-			columnPosition = column*3;
+	for(int linePosition = -12; linePosition <= 12; linePosition += 3) {
+		for(int columnPosition = -12; columnPosition <= 12; columnPosition += 3) {
 			// <LOGGER>
 			if (LOGGER) {
 				fprintf(fl_LOGGER, "\t[bfNormalizationFactorWithExtra] - X na matriz: %d || Y na matriz: %d\n", linePosition, columnPosition);
 			}
 			// </LOGGER>
-			distance = (linePosition*width) + columnPosition; // Calculando a distância 9 x 9
-			processWindowPosition = processPixelPosition + distance;
+			processWindowPosition = processPixelPosition + ((linePosition*width) + columnPosition);
 
-			if (processWindowPosition < 0 || processWindowPosition > imageSize || (processWindowPosition - (abs(linePosition*width))) < 0 || (processWindowPosition + (abs(linePosition*width))) > imageSize) {
+			if (processWindowPosition < 0 || processWindowPosition > imageSize) {
 				// <LOGGER>
 				if (LOGGER) {
 					fprintf(fl_LOGGER, "[bfNormalizationFactorWithExtra] - Valor fora da matrix\n");
@@ -142,45 +130,37 @@ float bfNormalizationFactorWithExtra(int processPixelPosition) {
 	}
 	// <LOGGER>
 	if (LOGGER) {
-		fprintf(fl_LOGGER, "[bfNormalizationFactorWithExtra] - Finalizando\n");
+		fprintf(fl_LOGGER, "[bfNormalizationFactorWithExtra] - Finalizando -> return %f\n", result);
 	}
 	// </LOGGER>
 	return result;
 }
 
 void bilateralFilter() {
-	// <LOGGER>
-	if (LOGGER) {
-		fprintf(fl_LOGGER, "\n[bilateralFilter] - Iniciando\n");
-	}
-	// </LOGGER>
-
 	for(int p = 0; p < imageSize ; p += 3) {
-		float Wp = normalizationFactor(p);
-		float extra = bfNormalizationFactorWithExtra(p);
-		float result = (extra/Wp);
-		int n = static_cast<int>(result);
-		unsigned char BF = (unsigned char)n;
+		int result = static_cast<int>(((1/normalizationFactor(p))*bfNormalizationFactorWithExtra(p)));
+		unsigned char BF = (unsigned char)result;
 		newImageData[p] = BF;
 		newImageData[p+1] = BF;
 		newImageData[p+2] = BF;
 		// <LOGGER>
 		if (LOGGER) {
-			fprintf(fl_LOGGER, "\t[bilateralFilter] - Pixel é: %d de %d\n", p, (width * height));
-			fprintf(fl_LOGGER, "\t[bilateralFilter] - extra value: %f\n", extra);
-			fprintf(fl_LOGGER, "\t[bilateralFilter] - Wp value: %f\n", Wp);
-			fprintf(fl_LOGGER, "\t[bilateralFilter] - RESULT value: %f\n", result);
+			fprintf(fl_LOGGER, "\n\t[bilateralFilter] - Pixel é: %d de %d\n", p, (width * height));
 			fprintf(fl_LOGGER, "\t[bilateralFilter] - BF value: %c\n", BF);
 		}
 		// </LOGGER>
 	}
-
-	// <LOGGER>
-	if (LOGGER) {
-		fprintf(fl_LOGGER, "[bilateralFilter] - Finalizando\n");
-	}
-	// </LOGGER>
 }
+
+void saveImageBMP(const char *fileName) {
+	FILE *bmpFile = fopen("image.bmp","w+");
+
+	fwrite(header, 1, 54, bmpFile);
+	fwrite(newImageData, 1, imageSize, bmpFile);
+
+	fclose(bmpFile);
+}
+
 
 int loadImageBMP(const char *imagepath) {
 	// Open the file
@@ -204,10 +184,11 @@ int loadImageBMP(const char *imagepath) {
 	dataPos    = *(int*)&(header[0x0A]);
 	width      = *(int*)&(header[0x12]);
 	height     = *(int*)&(header[0x16]);
+	imageSize  = *(int*)&(header[0x22]);
 
 	// Some BMP files are misformatted, guess missing information
 	if (imageSize == 0)
-		imageSize = width*height*channels; // 3 channels : one byte for each Red, Green and Blue component
+		imageSize = width*height*3; // 3 channels : one byte for each Red, Green and Blue component
 	if (dataPos == 0)
 		dataPos = 54; // The BMP header is done that way
 
@@ -219,27 +200,6 @@ int loadImageBMP(const char *imagepath) {
 
 	// Read the actual data from the file into the buffer
 	fread(data,1,imageSize,file);
-
-	int i;
-	for(i = 0; i < width * height ; ++i) {
-		int index = i*3;
-		unsigned char R, G, B;
-		B = data[index];
-		R = data[index+2];
-		data[index] = R;
-		data[index+2] = B;
-	}
-
-	// <LOGGER>
-	if (LOGGER) {
-		fprintf(fl_LOGGER, "[loadImageBMP] - Iniciando\n");
-		fprintf(fl_LOGGER, "\t[loadImageBMP] - Posição inicial do arquivo de imagem: %d\n", dataPos);
-		fprintf(fl_LOGGER, "\t[loadImageBMP] - Tamanho da imagem em KB: %d\n", imageSize);
-		fprintf(fl_LOGGER, "\t[loadImageBMP] - Comprimento da imagem: %d\n", width);
-		fprintf(fl_LOGGER, "\t[loadImageBMP] - Altura da imagem: %d\n", height);
-		fprintf(fl_LOGGER, "[loadImageBMP] - Finalizando\n");
-	} 
-	// </LOGGER>
 
 	//Everything is in memory now, the file can be closed
 	fclose(file);
@@ -312,7 +272,7 @@ int main(int argc, char **argv) {
 	//for(int i = 0; i < 10000;i+=1000)
 		//normalizationFactor(1);
 
-	char *fileName = getImageName(argv);
+	saveImageBMP(getImageName(argv));
 		
 	// <LOGGER>
 	if (LOGGER) {
