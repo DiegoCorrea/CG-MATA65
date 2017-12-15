@@ -13,8 +13,13 @@ unsigned char* base;
 unsigned char* compare;
 
 
-float imageSimilarity(){
-	 return 0.0;
+float imageSimilarity() {
+	int matrixSum = 0;
+	for(int pixel = 0; pixel < baseImageSize; pixel += 3) {
+		matrixSum += abs(base[pixel] - compare[pixel]);
+	}
+
+	return (1-(matrixSum/(baseHeight*baseWidth*255)))*100;
 }
 
 int loadImages(const char *basepath, const char *comparepath) {
@@ -41,6 +46,10 @@ int loadImages(const char *basepath, const char *comparepath) {
 	compareWidth      = *(int*)&(compareHeader[0x12]);
 	compareHeight     = *(int*)&(compareHeader[0x16]);
 	compareImageSize  = *(int*)&(compareHeader[0x22]);
+
+	if( baseWidth != compareWidth || baseHeight != compareHeight) {
+		printf("Tamanhos diferentes\n");
+	}
 
 
 	// Create a buffer
