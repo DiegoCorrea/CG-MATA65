@@ -10,11 +10,12 @@ unsigned char *base, *compare;
 
 float imageSimilarity() {
 	int matrixSum = 0;
-	for(int pixel = 0; pixel < baseImageSize; pixel += 3) {
+	for(int pixel = 0; pixel < baseImageSize && pixel < compareImageSize; pixel += 3) {
 		matrixSum += abs(base[pixel] - compare[pixel]);
 	}
-	float result = (1-(matrixSum/(baseHeight*baseWidth*255)))*100;
-	return result;
+	float resultBase = (1.0-( (float)matrixSum / (float)(baseHeight*baseWidth*255) ))*100.0;
+	float resultCompare = (1.0-( (float)matrixSum/ (float)(compareHeight*compareWidth*255)))*100.0;
+	return resultBase;
 }
 
 int loadImages(const char *basepath, const char *comparepath) {
