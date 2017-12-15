@@ -1,16 +1,11 @@
 # include <stdio.h>
 # include <stdlib.h>
-# include <string.h>
-# include <math.h>
 
 // BMP
-unsigned char baseHeader[54];
-unsigned char compareHeader[54];
-unsigned int baseDataPos, compareDataPos;
+unsigned char baseHeader[54], compareHeader[54];
 unsigned int baseWidth, baseHeight, compareWidth, compareHeight;
 unsigned int baseImageSize, compareImageSize;
-unsigned char* base;
-unsigned char* compare;
+unsigned char *base, *compare;
 
 
 float imageSimilarity() {
@@ -18,8 +13,8 @@ float imageSimilarity() {
 	for(int pixel = 0; pixel < baseImageSize; pixel += 3) {
 		matrixSum += abs(base[pixel] - compare[pixel]);
 	}
-
-	return (1-(matrixSum/(baseHeight*baseWidth*255)))*100;
+	float result = (1-(matrixSum/(baseHeight*baseWidth*255)))*100;
+	return result;
 }
 
 int loadImages(const char *basepath, const char *comparepath) {
@@ -31,26 +26,24 @@ int loadImages(const char *basepath, const char *comparepath) {
 		return 0;
 	}
 
-	if ( fread(baseHeader, 1, 54, fileBase) != 54 || fread(compareHeader, 1, 54, fileBase) != 54 ) { // If not 54 bytes read : problem
-		printf("Not a correct BMP file\n");
+	if ( fread(baseHeader, 1, 54, fileBase) != 54 || fread(compareHeader, 1, 54, fileCompare) != 54 ) { // If not 54 bytes read : problem
+		printf("Arquivo não BMP\n");
 		return 0;
 	}
 
 	// Read ints from the byte array
-	baseDataPos    = *(int*)&(baseHeader[0x0A]);
 	baseWidth      = *(int*)&(baseHeader[0x12]);
 	baseHeight     = *(int*)&(baseHeader[0x16]);
 	baseImageSize  = *(int*)&(baseHeader[0x22]);
 
-	compareDataPos    = *(int*)&(compareHeader[0x0A]);
 	compareWidth      = *(int*)&(compareHeader[0x12]);
 	compareHeight     = *(int*)&(compareHeader[0x16]);
 	compareImageSize  = *(int*)&(compareHeader[0x22]);
 
 	if( baseWidth != compareWidth || baseHeight != compareHeight) {
-		printf("Tamanhos diferentes\n");
+		printf("Tamanhos diferentes Width | %d -> %d || Height | %d -> %d \n", baseWidth, compareWidth, baseHeight, compareHeight);
+		exit(0);
 	}
-
 
 	// Create a buffer
 	base = (unsigned char *)malloc(baseImageSize);
@@ -73,7 +66,7 @@ int main(int argc, char **argv) {
 
 	loadImages(argv[1], argv[2]);
 
-	printf("\nSimilaridade da imagem %s \t\t-> %f\n", argv[1], imageSimilarity());
+	printf("\nSimilaridade da imagem %s com %s \t\t-> %f\n\n", argv[1], argv[2], imageSimilarity());
 
 	return 0;
 }
