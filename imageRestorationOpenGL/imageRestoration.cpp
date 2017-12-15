@@ -19,7 +19,6 @@ unsigned int imageSize;     		// width*height*channels
 unsigned char* data;        		// Actual RGB data
 unsigned char* newImageData;		// Actual RGB data
 unsigned char* data_histogram;	// Actual RGB data
-const int channels = 3;         // RGB channels
 
 const int phiS = 3;
 const int phiR = 8;
@@ -153,7 +152,7 @@ void bilateralFilter() {
 }
 
 void saveImageBMP(const char *fileName) {
-	FILE *bmpFile = fopen("image.bmp","w+");
+	FILE *bmpFile = fopen(fileName,"w+");
 
 	fwrite(header, 1, 54, bmpFile);
 	fwrite(newImageData, 1, imageSize, bmpFile);
@@ -243,8 +242,9 @@ char *getImageName(char **argv) {
 	// </LOGGER>
 
 	int len = strlen(argv[1]);
-    char *fileName = new char[len];
+  char *fileName = new char[len+6];
 	strncpy(fileName, argv[1], len-4);	
+	strcat(fileName, "-saida.bmp");
 	// <LOGGER>
 	if (LOGGER){
 		fprintf(fl_LOGGER, "\t[getImageName] - Nome da Imagem é: %s\n", fileName);
