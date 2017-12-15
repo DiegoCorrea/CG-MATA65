@@ -269,8 +269,6 @@ int main(int argc, char **argv) {
 	loadImageBMP(argv[1]);
 	histogram();
 	bilateralFilter();
-	//for(int i = 0; i < 10000;i+=1000)
-		//normalizationFactor(1);
 
 	saveImageBMP(getImageName(argv));
 		

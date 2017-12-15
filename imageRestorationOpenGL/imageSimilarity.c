@@ -1,61 +1,59 @@
-# include <GL/glut.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <math.h>
 
-using namespace std;
-
 // BMP
-unsigned char header[54];
-unsigned int dataPos;
-unsigned int width, height;
-unsigned int imageSize;
+unsigned char baseHeader[54];
+unsigned char compareHeader[54];
+unsigned int baseDataPos, compareDataPos;
+unsigned int baseWidth, baseHeight, compareWidth, compareHeight;
+unsigned int baseImageSize, compareImageSize;
 unsigned char* base;
 unsigned char* compare;
 
 
-int loadImageBMP(const char *imagepath) {
+float imageSimilarity(){
+	 return 0.0;
+}
+
+int loadImages(const char *basepath, const char *comparepath) {
 	// Open the file
-	FILE *file = fopen(imagepath,"rb");
-	if (!file) {
+	FILE *fileBase = fopen(basepath,"rb");
+	FILE *fileCompare = fopen(comparepath,"rb");
+	if (!fileBase || !fileCompare) {
 		printf("O arquivo não pode ser aberto\n"); 
 		return 0;
 	}
 
-	if ( fread(header, 1, 54, file)!=54 ) { // If not 54 bytes read : problem
-		printf("Not a correct BMP file\n");
-		return 0;
-	}
-
-	if ( header[0]!='B' || header[1]!='M' ) {
+	if ( fread(baseHeader, 1, 54, fileBase) != 54 || fread(compareHeader, 1, 54, fileBase) != 54 ) { // If not 54 bytes read : problem
 		printf("Not a correct BMP file\n");
 		return 0;
 	}
 
 	// Read ints from the byte array
-	dataPos    = *(int*)&(header[0x0A]);
-	width      = *(int*)&(header[0x12]);
-	height     = *(int*)&(header[0x16]);
-	imageSize  = *(int*)&(header[0x22]);
+	baseDataPos    = *(int*)&(baseHeader[0x0A]);
+	baseWidth      = *(int*)&(baseHeader[0x12]);
+	baseHeight     = *(int*)&(baseHeader[0x16]);
+	baseImageSize  = *(int*)&(baseHeader[0x22]);
 
-	// Some BMP files are misformatted, guess missing information
-	if (imageSize == 0)
-		imageSize = width*height*3; // 3 channels : one byte for each Red, Green and Blue component
-	if (dataPos == 0)
-		dataPos = 54; // The BMP header is done that way
+	compareDataPos    = *(int*)&(compareHeader[0x0A]);
+	compareWidth      = *(int*)&(compareHeader[0x12]);
+	compareHeight     = *(int*)&(compareHeader[0x16]);
+	compareImageSize  = *(int*)&(compareHeader[0x22]);
 
 
 	// Create a buffer
-	data = (unsigned char *)malloc(imageSize);
-	data_histogram = (unsigned char *)malloc(imageSize);
-	newImageData = (unsigned char *)malloc(imageSize);	
+	base = (unsigned char *)malloc(baseImageSize);
+	compare = (unsigned char *)malloc(compareImageSize);
 
 	// Read the actual data from the file into the buffer
-	fread(data,1,imageSize,file);
+	fread(base, 1, baseImageSize, fileBase);
+	fread(compare, 1, compareImageSize, fileCompare);
 
 	//Everything is in memory now, the file can be closed
-	fclose(file);
+	fclose(fileBase);
+	fclose(fileCompare);
 }
 
 int main(int argc, char **argv) {
@@ -63,4 +61,10 @@ int main(int argc, char **argv) {
 		printf("Uma imagem é necessaria\n");
 		return 1;
 	}
+
+	loadImages(argv[1], argv[2]);
+
+	printf("\nSimilaridade da imagem %s \t\t-> %f\n", argv[1], imageSimilarity());
+
+	return 0;
 }

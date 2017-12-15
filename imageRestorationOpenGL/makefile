@@ -1,5 +1,6 @@
 all: 
 	g++ -o imageRestoration imageRestoration.cpp -lglut -lGLU -lGL -lm
+	gcc -o imageSimilarity imageSimilarity.c
 
 run:
 	./imageRestoration ./entradas/cidade.bmp
@@ -11,3 +12,5 @@ run:
 	./imageRestoration ./entradas/picture_4_entrada.bmp
 	./imageRestoration ./entradas/picture_5_entrada.bmp
 
+similarity:
+	./imageSimilarity ./entradas/cidade.bmp ./cidade-saida.bmp
