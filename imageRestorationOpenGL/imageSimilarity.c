@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 
 	loadImages(argv[1], argv[2]);
 
-	printf("\nSimilaridade da imagem %s com %s \t\t-> %f\n\n", argv[1], argv[2], imageSimilarity());
+	printf("Similaridade -> %f\n\n", imageSimilarity());
 
 	return 0;
 }
