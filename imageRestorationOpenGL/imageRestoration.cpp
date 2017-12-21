@@ -46,92 +46,47 @@ void histogram() {
   }
 }
 
+double euclideanDistance(int baseX, int baseY, int compareX, int compareY) {
+	return sqrt(pow(compareX - baseX, 2.0) + pow(compareY - baseY, 2.0));
+}
+
 float gaussianFunction(int distance, int factor) {
 	float eulerNumber = exp(-(pow(distance, 2)/(2*pow(factor, 2))));
 	float firstPart = 1/(2*(PI*(pow(factor, 2))));
-	float result = firstPart*eulerNumber;
-	
-	// <LOGGER>
-	if (LOGGER) {
-		fprintf(fl_LOGGER, "[gaussianFunction] -> return %f\n", result);
-	} 
-	// </LOGGER>
 
-	return result;
+	return firstPart*eulerNumber;
 }
 
 float normalizationFactor(int processPixelPosition) {
 	float Wp = 0;
 	int processWindowPosition = 0;
-	// <LOGGER>
-	if (LOGGER) {
-		fprintf(fl_LOGGER, "\n[normalizationFactor] - Iniciando\n");
-	}
-	// </LOGGER>
 	for(int linePosition = -12; linePosition <= 12; linePosition += 3) {
 		for(int columnPosition = -12; columnPosition <= 12; columnPosition += 3) {
-			// <LOGGER>
-			if (LOGGER) {
-				fprintf(fl_LOGGER, "\t[normalizationFactor] - X na matriz: %d || Y na matriz: %d\n", linePosition, columnPosition);
-			}
-			// </LOGGER>
-
 			processWindowPosition = processPixelPosition + (linePosition*width) + columnPosition;
-
 			if (processWindowPosition < 0 || processWindowPosition > imageSize) {
-				// <LOGGER>
-				if (LOGGER) {
-					fprintf(fl_LOGGER, "\t[normalizationFactor] - Valor fora da imagem\n");
-				}
-				// </LOGGER>
 				Wp += 0;
 			} else {
 				Wp += gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR);
+				euclideanDistance(processPixelPosition % width, processWindowPosition % width, processPixelPosition % height, processWindowPosition % height);
 			}
 		}
 	}
-	// <LOGGER>
-	if (LOGGER) {
-		fprintf(fl_LOGGER, "[normalizationFactor] - Finalizando -> return %f\n", Wp);
-	}
-	// </LOGGER>
 	return Wp;
 }
 
 float bfNormalizationFactorWithExtra(int processPixelPosition) {
 	float result = 0;
 	int processWindowPosition = 0;
-	// <LOGGER>
-	if (LOGGER) {
-		fprintf(fl_LOGGER, "\n[bfNormalizationFactorWithExtra] - Iniciando\n");
-	}
-	// </LOGGER>
 	for(int linePosition = -12; linePosition <= 12; linePosition += 3) {
 		for(int columnPosition = -12; columnPosition <= 12; columnPosition += 3) {
-			// <LOGGER>
-			if (LOGGER) {
-				fprintf(fl_LOGGER, "\t[bfNormalizationFactorWithExtra] - X na matriz: %d || Y na matriz: %d\n", linePosition, columnPosition);
-			}
-			// </LOGGER>
 			processWindowPosition = processPixelPosition + ((linePosition*width) + columnPosition);
-
 			if (processWindowPosition < 0 || processWindowPosition > imageSize) {
-				// <LOGGER>
-				if (LOGGER) {
-					fprintf(fl_LOGGER, "[bfNormalizationFactorWithExtra] - Valor fora da matrix\n");
-				}
-				// </LOGGER>
 				result += 0;
 			} else {
 				result += (gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR)) * data_histogram[processWindowPosition];
 			}
 		}
 	}
-	// <LOGGER>
-	if (LOGGER) {
-		fprintf(fl_LOGGER, "[bfNormalizationFactorWithExtra] - Finalizando -> return %f\n", result);
-	}
-	// </LOGGER>
 	return result;
 }
 
@@ -142,12 +97,6 @@ void bilateralFilter() {
 		newImageData[p] = BF;
 		newImageData[p+1] = BF;
 		newImageData[p+2] = BF;
-		// <LOGGER>
-		if (LOGGER) {
-			fprintf(fl_LOGGER, "\n\t[bilateralFilter] - Pixel é: %d de %d\n", p, (width * height));
-			fprintf(fl_LOGGER, "\t[bilateralFilter] - BF value: %c\n", BF);
-		}
-		// </LOGGER>
 	}
 }
 
@@ -235,22 +184,11 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 char *getImageName(char **argv) {
-	// <LOGGER>
-	if (LOGGER) {
-		fprintf(fl_LOGGER, "[getImageName] - Iniciando\n");
-	}
-	// </LOGGER>
-
 	int len = strlen(argv[1]);
   char *fileName = new char[len+6];
 	strncpy(fileName, argv[1], len-4);	
 	strcat(fileName, "-saida.bmp");
-	// <LOGGER>
-	if (LOGGER){
-		fprintf(fl_LOGGER, "\t[getImageName] - Nome da Imagem é: %s\n", fileName);
-		fprintf(fl_LOGGER, "\t[getImageName] - Finalizando\n");
-	}
-	// </LOGGER>
+	
 	return fileName;
 }
 
@@ -278,7 +216,7 @@ int main(int argc, char **argv) {
 		fclose( fl_LOGGER );
 	} 
 	// </LOGGER>
-
+	/*
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize(width*2, height);
@@ -289,6 +227,6 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(keyboard);
 	glutDisplayFunc(display);
 	glutMainLoop();
-
+	*/
 	return 0;
 }
