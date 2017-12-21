@@ -24,10 +24,10 @@ const int phiS = 3;
 const int phiR = 8;
 
 void histogram() {
-  float z = 0.0;
+  double z = 0.0;
   int grayLevel[256] = { 0 };
 	int totalGray = 0;
-	float sk[256] = { 0 };
+	double sk[256] = { 0 };
 
   for (int i = 0; i < imageSize; i += 3) {
     grayLevel[data[i]]++;
@@ -35,7 +35,7 @@ void histogram() {
   }
 
   for (int i = 0; i < 256; ++i) {
-    z += (float)((float)grayLevel[i]/(float)totalGray);
+    z += (double)((double)grayLevel[i]/(double)totalGray);
     sk[i] = z*256;
   }
 
@@ -46,44 +46,69 @@ void histogram() {
   }
 }
 
-double euclideanDistance(int baseX, int baseY, int compareX, int compareY) {
+double euclideanDistance(int baseX, int compareX, int baseY, int compareY) {
 	return sqrt(pow(compareX - baseX, 2.0) + pow(compareY - baseY, 2.0));
 }
 
-float gaussianFunction(int distance, int factor) {
-	float eulerNumber = exp(-(pow(distance, 2)/(2*pow(factor, 2))));
-	float firstPart = 1/(2*(PI*(pow(factor, 2))));
+double gaussianFunction(double distance, int factor) {
+	double eulerNumber = exp(-(pow(distance, 2)/(2*pow(factor, 2))));
+	double firstPart = 1/(2*(PI*(pow(factor, 2))));
 
 	return firstPart*eulerNumber;
 }
 
-float normalizationFactor(int processPixelPosition) {
-	float Wp = 0;
+double normalizationFactor(int processPixelPosition) {
+	double Wp = 0.0;
 	int processWindowPosition = 0;
+	int comparePixelWidth, comparePixelHeight, basePixelWidth, basePixelHeight;
+
 	for(int linePosition = -12; linePosition <= 12; linePosition += 3) {
 		for(int columnPosition = -12; columnPosition <= 12; columnPosition += 3) {
 			processWindowPosition = processPixelPosition + (linePosition*width) + columnPosition;
 			if (processWindowPosition < 0 || processWindowPosition > imageSize) {
-				Wp += 0;
+				Wp += 0.0;
 			} else {
-				Wp += gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR);
-				euclideanDistance(processPixelPosition % width, processWindowPosition % width, processPixelPosition % height, processWindowPosition % height);
+				comparePixelWidth = processWindowPosition / (width*3);
+				comparePixelHeight = processWindowPosition / (height*3);
+
+				basePixelWidth = processPixelPosition / (width*3);
+				basePixelHeight = processPixelPosition / (height*3);
+
+				if((abs(basePixelWidth - comparePixelWidth) > 4) || (abs(basePixelHeight - comparePixelHeight) > 4)){
+					Wp += 0.0;
+				} else {
+					//Wp += gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR);
+					Wp += gaussianFunction(euclideanDistance(basePixelWidth, comparePixelWidth, basePixelHeight, comparePixelHeight), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR);
+				}
 			}
 		}
 	}
 	return Wp;
 }
 
-float bfNormalizationFactorWithExtra(int processPixelPosition) {
-	float result = 0;
+double bfNormalizationFactorWithExtra(int processPixelPosition) {
+	double result = 0.0;
 	int processWindowPosition = 0;
+	int comparePixelWidth, comparePixelHeight, basePixelWidth, basePixelHeight;
+
 	for(int linePosition = -12; linePosition <= 12; linePosition += 3) {
 		for(int columnPosition = -12; columnPosition <= 12; columnPosition += 3) {
 			processWindowPosition = processPixelPosition + ((linePosition*width) + columnPosition);
 			if (processWindowPosition < 0 || processWindowPosition > imageSize) {
-				result += 0;
+				result += 0.0;
 			} else {
-				result += (gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR)) * data_histogram[processWindowPosition];
+				comparePixelWidth = (processWindowPosition / (width*3));
+				comparePixelHeight = (processWindowPosition / (height*3));
+
+				basePixelWidth = (processPixelPosition / (width*3));
+				basePixelHeight = (processPixelPosition / (height*3));
+
+				if((abs(basePixelWidth - comparePixelWidth) > 4) || (abs(basePixelHeight - comparePixelHeight) > 4)){
+					result += 0.0;
+				} else {
+					//result += (gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR)) * data_histogram[processWindowPosition];
+					result += gaussianFunction(euclideanDistance(basePixelWidth, comparePixelWidth, basePixelHeight, comparePixelHeight), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR) * data_histogram[processWindowPosition];
+				}
 			}
 		}
 	}
@@ -91,6 +116,7 @@ float bfNormalizationFactorWithExtra(int processPixelPosition) {
 }
 
 void bilateralFilter() {
+	int widthPosition = 0, level = 0;
 	for(int p = 0; p < imageSize ; p += 3) {
 		int result = static_cast<int>(((1/normalizationFactor(p))*bfNormalizationFactorWithExtra(p)));
 		unsigned char BF = (unsigned char)result;
@@ -101,7 +127,7 @@ void bilateralFilter() {
 }
 
 void saveImageBMP(const char *fileName) {
-	FILE *bmpFile = fopen(fileName,"w+");
+	FILE *bmpFile = fopen(fileName,"wb");
 
 	fwrite(header, 1, 54, bmpFile);
 	fwrite(newImageData, 1, imageSize, bmpFile);
@@ -185,10 +211,9 @@ void keyboard(unsigned char key, int x, int y) {
 
 char *getImageName(char **argv) {
 	int len = strlen(argv[1]);
-  char *fileName = new char[len+6];
-	strncpy(fileName, argv[1], len-4);	
-	strcat(fileName, "-saida.bmp");
-	
+  char *fileName = new char[len+15];
+	strcpy(fileName, argv[1]);	
+	strcat(fileName, "_saida.bmp\0");
 	return fileName;
 }
 
