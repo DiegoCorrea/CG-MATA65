@@ -278,7 +278,7 @@ int main(int argc, char **argv) {
 		fclose( fl_LOGGER );
 	} 
 	// </LOGGER>
-	/*
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize(width*2, height);
@@ -289,7 +289,6 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(keyboard);
 	glutDisplayFunc(display);
 	glutMainLoop();
-	*/
 
 	return 0;
 }
