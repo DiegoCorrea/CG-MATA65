@@ -16,32 +16,59 @@ void Inicializa() {
   glOrtho(-5.0, 5.0, -5.0, 5.0, -3.0, 3.0);
 
   // Define a cor de fundo da janela como azul
-  glClearColor(0.0, 0.0, 1.0, 1.0);
+  glClearColor(1.0, 1.0, 1.0, 1.0);
 
   glMatrixMode(GL_MODELVIEW);
 }
 // Funcao callback chamada para fazer o desenho
 void Desenha() {
-  static GLint vertices[8*3] = { 
-    -1, -1, -1, 
-    1, -1, -1, 
-    1, 1, -1, 
-    -1, 1, -1,
-    -1, -1, 1, 
-    1, -1, 1, 
-    1, 1, 1, 
-    -1, 1, 1
+  static GLint vertices[18*3] = { 
+    -1, -1, -1, // v 0
+    0, -1, -1,  // v 1
+    1, -1, -1,  // v 2
+    -1, 0, -1,  // v 3
+    0, 0, -1,   // v 4
+    1, 0, -1,   // v 5
+    -1, 1, -1,  // v 6
+    0, 1, -1,   // v 7
+    1, 1, -1,   // v 8
+    -1, -1, 0,  // v 9
+    0, -1, 0,   // v 10
+    1, -1, 0,   // v 11
+    -1, 0, 0,   // v 12
+    0, 0, 0,    // v 13
+    1, 0, 0,    // v 14
+    -1, 1, 0,   // v 15
+    0, 1, 0,    // v 16
+    1, 1, 0     // v 17
   };
-  static GLubyte faces[6*4] = { 
-    0, 3, 2, 1,
-    4, 5, 6, 7, 
-    0, 4, 7, 3, 
-    1, 2, 6, 5,
-    0, 1, 5, 4,
-    2, 3, 7, 6
-
+  static GLubyte faces[6*4*4] = { 
+    0, 3, 4, 1,     //Cubo 1
+    9, 10, 13, 12,
+    0, 9, 12, 3,
+    13, 10, 1, 4,
+    3, 12, 13, 4,
+    0, 1, 10, 9,    //Cubo 1
+    1, 4, 5, 2,     //cubo 2
+    10, 11, 14, 13,
+    1, 10, 13, 4,
+    11, 2, 5, 14,
+    4, 13, 14, 5,
+    1, 2, 11, 10,   //cubo 2
+    3, 6, 7, 4,     // cubo 3
+    12, 13, 16, 15,
+    3, 12, 15, 6,
+    16, 13, 4, 7,
+    6, 15, 16, 7,
+    3, 4, 13, 12,   // cubo 3
+    7, 8, 5, 4,     // cubo 4
+    16, 13, 14, 17,
+    7, 4, 13, 16,
+    17, 14, 5, 8,
+    13, 4, 5, 14,
+    16, 17, 8, 7    // cubo 4
   };
-  static GLfloat cores[8*3] = { 
+  static GLfloat cores[9*2*3] = { 
     1.0, 1.0, 1.0, 
     0.5, 0.5, 0.5, 
     0.25, 0.25, 0.25, 
@@ -49,7 +76,17 @@ void Desenha() {
     1.0, 1.0, 1.0, 
     0.5, 0.5, 0.5, 
     0.25, 0.25, 0.25, 
-    0.0, 0.0, 0.0
+    0.0, 0.0, 0.0,
+    1.0, 1.0, 1.0, 
+    0.5, 0.5, 0.5, 
+    0.25, 0.25, 0.25, 
+    0.0, 0.0, 0.0,
+    1.0, 1.0, 1.0, 
+    0.5, 0.5, 0.5, 
+    0.25, 0.25, 0.25, 
+    0.0, 0.0, 0.0,
+    0.5, 0.5, 0.5, 
+    0.25, 0.25, 0.25
   };
 
   glEnable(GL_DEPTH_TEST);
@@ -67,7 +104,7 @@ void Desenha() {
   glVertexPointer(3, GL_INT, 0, vertices);
   glColorPointer(3, GL_FLOAT, 0, cores);
 
-  glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, faces);
+  glDrawElements(GL_QUADS, 96, GL_UNSIGNED_BYTE, faces);
 
   glDisableClientState(GL_COLOR_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
