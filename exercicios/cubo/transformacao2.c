@@ -8,16 +8,19 @@
 // executadas antes da exibicao do desenho
 void Inicializa(){
 
-  // Define a janela de visualiza��o
+  // Define a janela de visualizacao
   glMatrixMode(GL_PROJECTION);
 
   // Define o sistema de coordenadas
-  glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+  //glFrustum(-10.0, 10.0, -10.0, 10.0, 1.0, 30.0);
+  glOrtho(-8.0, 8.0, -8.0, 8.0, -1.0, 1.0);
 
   // Define a cor de fundo da janela como azul
   glClearColor(0.0, 0.0, 1.0, 1.0);
-}
 
+  glMatrixMode(GL_MODELVIEW);
+
+}
 
 // Funcao callback chamada para fazer o desenho
 void Desenha(){
@@ -28,13 +31,24 @@ void Desenha(){
 
   // Define a cor de desenho como vermelho
   glColor3f(1.0, 0.56, 0.0);
+  //glRotatef(45, 0, 0, 1);
+  //glTranslatef(0.5, 0, 0);
+  //glScalef(0.5, 0.5, 0.5);
+
 
   // Desenha um triangulo
-  glBegin(GL_QUADS);
-    glVertex3f(-1.0, -1.0, 3.0);
-    glVertex3f(1.0, -1.0, 3.0);
-    glVertex3f(1.0, 1.0, 3.0);
-    glVertex3f(-1.0, 1.0, 3.0);
+  glBegin(GL_LINE_LOOP);
+    glVertex3f(4.0, 0.0, 0.0);
+    glVertex3f(3.0, -3.0, 0.0);
+    glVertex3f(0.0, -4.0, 0.0);
+    glVertex3f(3.0, -5.0, 0.0);
+
+    glVertex3f(4.0, -8.0, 0.0);
+    glVertex3f(5.0, -5.0, 0.0);
+    glVertex3f(8.0, -4.0, 0.0);
+    glVertex3f(5.0, -3.0, 0.0);
+     //glVertex3f(4.0, 0.0, 0.0);
+
   glEnd();
 
   // Executa os comandos OpenGL para renderizacao
@@ -55,6 +69,7 @@ int main(int argc, char** argv){
 
   // Define a funcao responsavel por redesenhar a janela OpenGL sempre que necessario
   glutDisplayFunc(Desenha);
+  
 
   // Inicializacoes de OpenGL executadas antes da exibicao do desenho
   Inicializa();

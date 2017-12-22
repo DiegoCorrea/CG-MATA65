@@ -77,7 +77,6 @@ double normalizationFactor(int processPixelPosition) {
 				if((abs(basePixelWidth - comparePixelWidth) > 4) || (abs(basePixelHeight - comparePixelHeight) > 4)){
 					Wp += 0.0;
 				} else {
-					//Wp += gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR);
 					Wp += gaussianFunction(euclideanDistance(basePixelWidth, comparePixelWidth, basePixelHeight, comparePixelHeight), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR);
 				}
 			}
@@ -106,7 +105,6 @@ double bfNormalizationFactorWithExtra(int processPixelPosition) {
 				if((abs(basePixelWidth - comparePixelWidth) > 4) || (abs(basePixelHeight - comparePixelHeight) > 4)){
 					result += 0.0;
 				} else {
-					//result += (gaussianFunction(abs(processPixelPosition - processWindowPosition), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR)) * data_histogram[processWindowPosition];
 					result += gaussianFunction(euclideanDistance(basePixelWidth, comparePixelWidth, basePixelHeight, comparePixelHeight), phiS) * gaussianFunction((data_histogram[processPixelPosition] - data_histogram[processWindowPosition]), phiR) * data_histogram[processWindowPosition];
 				}
 			}
@@ -222,12 +220,6 @@ int main(int argc, char **argv) {
 		printf("Uma imagem é necessaria\n");
 		return 1;
 	}
-	// <LOGGER>
-	if (LOGGER) {
-		fl_LOGGER = fopen("imageRestoration.log", "w+" );
-		fprintf(fl_LOGGER, "[main] - Iniciando Restauração de Imagem\n");
-	} 
-	// </LOGGER>
 
 	loadImageBMP(argv[1]);
 	histogram();
@@ -235,13 +227,7 @@ int main(int argc, char **argv) {
 
 	saveImageBMP(getImageName(argv));
 		
-	// <LOGGER>
-	if (LOGGER) {
-		fprintf(fl_LOGGER, "[main] - Finalizando processamento e exibindo tela\n");
-		fclose( fl_LOGGER );
-	} 
-	// </LOGGER>
-	/*
+	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize(width*2, height);
@@ -252,6 +238,6 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(keyboard);
 	glutDisplayFunc(display);
 	glutMainLoop();
-	*/
+	
 	return 0;
 }
