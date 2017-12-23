@@ -22,58 +22,77 @@ void Inicializa() {
 }
 // Funcao callback chamada para fazer o desenho
 void Desenha() {
-  static GLint vertices[9*2*3] = { 
-    -1, -1, -1, // v 0
-    0, -1, -1,  // v 1
-    1, -1, -1,  // v 2
-    -1, 0, -1,  // v 3
-    0, 0, -1,   // v 4
-    1, 0, -1,   // v 5
-    -1, 1, -1,  // v 6
-    0, 1, -1,   // v 7
-    1, 1, -1,   // v 8
-    -1, -1, 0,  // v 9
-    0, -1, 0,   // v 10
-    1, -1, 0,   // v 11
-    -1, 0, 0,   // v 12
-    0, 0, 0,    // v 13
-    1, 0, 0,    // v 14
-    -1, 1, 0,   // v 15
-    0, 1, 0,    // v 16
-    1, 1, 0     // v 17
+  static GLint vertices[8*4*3] = { 
+    // Cube 0
+    -2.1, -2.1, -2.1,   // v 0
+    -2.1, -0.1, -2.1,   // v 1
+    -0.1, -0.1, -2.1,   // v 2
+    -0.1, -2.1, -2.1,   // v 3
+    -2.1, -2.1, -0.1,   // v 4
+    -2.1, -0.1, -0.1,   // v 5
+    -0.1, -0.1, -0.1,   // v 6
+    -0.1, -2.1, -0.1,   // v 7
+    // Cube 1
+    0.1, -2.1, -2.1,    // v 8
+    0.1, -0.1, -2.1,    // v 9
+    2.1, -0.1, -2.1,    // v 10
+    2.1, -2.1, -2.1,    // v 11
+    0.1, -2.1, -0.1,    // v 12
+    0.1, -0.1, -0.1,    // v 13
+    2.1, -0.1, -0.1,    // v 14
+    2.1, -2.1, -0.1,    // v 15
+    // Cube 2
+    -2.1, 0.1, -2.1,   // v 16
+    -2.1, 2.1, -2.1,   // v 17
+    -0.1, 2.1, -2.1,   // v 18
+    -0.1, 0.1, -2.1,   // v 19
+    -2.1, 0.1, -0.1,   // v 20
+    -2.1, 2.1, -0.1,   // v 21
+    -0.1, 2.1, -0.1,   // v 22
+    -0.1, 0.1, -0.1,   // v 23
+    // Cube 3
+    0.1, 0.1, -2.1,    // v 24
+    0.1, 2.1, -2.1,    // v 25
+    2.1, 2.1, -2.1,    // v 26
+    2.1, 0.1, -2.1,    // v 27
+    0.1, 0.1, -0.1,    // v 28
+    0.1, 2.1, -0.1,    // v 29
+    2.1, 2.1, -0.1,    // v 30
+    2.1, 0.1, -0.1,    // v 31
   };
   static GLubyte faces[6*4*4] = { 
+    // Cube 0
+    0, 1, 2, 3,       // Face 0 Color Red
+    5, 4, 7, 6,       // Face 1 Color Black
+    0, 4, 5, 1,       // Face 2 Color Blue
+    6, 7, 3, 2,       // Face 3 Color Black
+    1, 5, 6, 2,       // Face 4 Color Black
+    0, 3, 7, 4,       // Face 5 Color White
     // Cube 1
-    0, 3, 4, 1,     // Face 1 Color Red
-    9, 10, 13, 12,  // Face 2 Color Black
-    0, 9, 12, 3,    // Face 3 Color Blue
-    13, 10, 1, 4,   // Face 4 Color Black
-    3, 12, 13, 4,   // Face 5 Color Black
-    0, 1, 10, 9,    // Face 6 Color White
+    9, 10, 11, 8,     // Face 0 Color Red
+    13, 12, 15, 14,   // Face 1 Color Black
+    9, 8, 12, 13,     // Face 2 Color Black
+    14, 15, 11, 10,   // Face 3 Color Green
+    9, 13, 14, 10,    // Face 4 Color Black
+    8, 11, 15, 12,    // Face 5 Color White
     // Cube 2
-    1, 4, 5, 2,     // Face 1 Color Red
-    10, 11, 14, 13, // Face 2 Color Black
-    1, 10, 13, 4,   // Face 3 Color Black
-    11, 2, 5, 14,   // Face 4 Color Green
-    4, 13, 14, 5,   // Face 5 Color Black
-    1, 2, 11, 10,   // Face 6 Color White
+    17, 18, 19, 16,   // Face 0 Color Red
+    20, 23, 22, 21,   // Face 1 Color Black
+    17, 16, 20, 21,   // Face 2 Color Blue
+    18, 22, 19, 18,   // Face 3 Color Black
+    17, 21, 22, 18,   // Face 4 Color Yellow
+    16, 19, 23, 20,   // Face 5 Color Black
     // Cube 3
-    3, 6, 7, 4,     // Face 1 Color Red
-    12, 13, 16, 15, // Face 2 Color Black
-    3, 12, 15, 6,   // Face 3 Color Blue
-    16, 13, 4, 7,   // Face 4 Color Black
-    6, 15, 16, 7,   // Face 5 Color Yellow
-    3, 4, 13, 12,   // Face 6 Color Black
-    // Cube 4
-    7, 8, 5, 4,     // Face 1 Color Red
-    16, 13, 14, 17, // Face 2 Color Black
-    7, 4, 13, 16,   // Face 3 Color Black
-    17, 14, 5, 8,   // Face 4 Color Green
-    16, 17, 8, 7,   // Face 5 Color Black
-    13, 4, 5, 14    // Face 6 Color Yellow
+    24, 25, 26, 27,   // Face 0 Color Red
+    28, 31, 30, 29,   // Face 1 Color Black
+    25, 24, 28, 29,   // Face 2 Color Black
+    30, 31, 27, 26,   // Face 3 Color Green
+    25, 29, 30, 26,   // Face 4 Color Black
+    24, 27, 31, 28    // Face 5 Color Yellow
     //
   };
-  static GLfloat cores[9*2*3] = { 
+  static GLfloat cores[8*4*3] = { 
+    //Cube 0
     1.0, 0.0, 0.0,      // v 0 Color Red
     1.0, 0.0, 0.0,      // v 1 Color Red
     1.0, 0.0, 0.0,      // v 2 Color Red
@@ -82,6 +101,7 @@ void Desenha() {
     1.0, 0.0, 0.0,      // v 5 Color Red
     1.0, 0.0, 0.0,      // v 6 Color Red
     1.0, 0.0, 0.0,      // v 7 Color Red
+    //Cube 1
     1.0, 0.0, 0.0,      // v 8 Color Red
     0.11, 0.49, 0.95,   // v 9 Color Blue
     1.0, 1.0, 1.0,      // v 10 Color White
@@ -90,8 +110,24 @@ void Desenha() {
     0.0, 0.0, 0.0,      // v 13 Color Black
     0.2, 0.44, 0.28,    // v 14 Color Green
     0.11, 0.49, 0.95,   // v 15 Color Blue
+    // Cube 2
     0.93, 0.93, 0.0,    // v 16 Color Yellow
-    0.2, 0.44, 0.28     // v 17 Color Green
+    0.2, 0.44, 0.28,     // v 17 Color Green
+    1.0, 1.0, 1.0,      // v 10 Color White
+    0.2, 0.44, 0.28,    // v 11 Color Green
+    0.11, 0.49, 0.95,   // v 12 Color Blue
+    0.0, 0.0, 0.0,      // v 13 Color Black
+    0.2, 0.44, 0.28,    // v 14 Color Green
+    0.11, 0.49, 0.95,   // v 15 Color Blue
+    // Cube 3
+    0.93, 0.93, 0.0,    // v 16 Color Yellow
+    1.0, 1.0, 1.0,      // v 10 Color White
+    0.2, 0.44, 0.28,    // v 11 Color Green
+    0.11, 0.49, 0.95,   // v 12 Color Blue
+    0.0, 0.0, 0.0,      // v 13 Color Black
+    0.2, 0.44, 0.28,    // v 14 Color Green
+    0.11, 0.49, 0.95,   // v 15 Color Blue
+    0.93, 0.93, 0.0    // v 16 Color Yellow
   };
 
   glEnable(GL_DEPTH_TEST);
@@ -124,7 +160,7 @@ void keyboard(unsigned char key, int x, int y){
       glutPostRedisplay();
     break;
     case 's': 
-      angulo_x++;
+      angulo_x--;
       glutPostRedisplay();
     break;
     case 'a': 
@@ -132,9 +168,11 @@ void keyboard(unsigned char key, int x, int y){
       glutPostRedisplay();
     break;
     case 'd': 
-      angulo_y++;
+      angulo_y--;
       glutPostRedisplay();
     break;
+    case 27:
+      exit(0);
   }
 }
 
@@ -148,7 +186,7 @@ int main(int argc, char** argv){
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 
   // Cria uma janela GLUT que permite a execucao de comandos OpenGL
-  glutCreateWindow("Cubo!");
+  glutCreateWindow("Universal Magic Cube");
 
   // Define a funcao responsavel por redesenhar a janela OpenGL sempre que necessario
   glutDisplayFunc(Desenha);  
