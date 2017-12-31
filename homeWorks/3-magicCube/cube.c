@@ -1,5 +1,9 @@
 # include <GL/glut.h>
+# define SCREEN_WIDTH 500
+# define SCREEN_HEIGHT 500
+
 int angle_x = 0, angle_y = 0, angle_z = 0;
+GLfloat edgeLenght = 2.0;
 
 void startingFieldOfView() {
 
@@ -11,7 +15,60 @@ void startingFieldOfView() {
 
   glMatrixMode(GL_MODELVIEW);
 }
+void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ) {
+  GLfloat vertices[3*8] = { 
+    centerX - edgeLenght, centerY - edgeLenght, centerZ - edgeLenght,   // v 0
+    centerX - edgeLenght, centerY + edgeLenght, centerZ - edgeLenght,   // v 1
+    centerX + edgeLenght, centerY + edgeLenght, centerZ - edgeLenght,   // v 2
+    centerX + edgeLenght, centerY - edgeLenght, centerZ - edgeLenght,   // v 3
 
+    centerX - edgeLenght, centerY - edgeLenght, centerZ + edgeLenght,   // v 4
+    centerX - edgeLenght, centerY + edgeLenght, centerZ + edgeLenght,   // v 5
+    centerX + edgeLenght, centerY + edgeLenght, centerZ + edgeLenght,   // v 6
+    centerX + edgeLenght, centerY - edgeLenght, centerZ + edgeLenght   // v 7
+  };
+  GLubyte faces[8*4] = { 
+    // Cube 0
+    0, 1, 2, 3,   // Face BACK
+    5, 4, 7, 6,   // Face FRONT
+    0, 4, 5, 1,   // Face LEFT
+    6, 7, 3, 2,   // Face RIGHT
+    1, 5, 6, 2,   // Face TOP
+    0, 3, 7, 4   // Face BOTTOM
+  };
+  GLfloat colors[8*3] = { 
+    1.0, 0.0, 0.0,      // v 0 Color
+    1.0, 0.0, 0.0,      // v 1 Color
+    1.0, 0.0, 0.0,      // v 2 Color
+    1.0, 0.0, 0.0,      // v 3 Color
+    1.0, 0.0, 0.0,      // v 4 Color
+    1.0, 0.0, 0.0,      // v 5 Color
+    1.0, 0.0, 0.0,      // v 6 Color
+    1.0, 0.0, 0.0      // v 7 Color
+  };
+
+  glEnable(GL_DEPTH_TEST);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+
+  glRotatef(angle_x, 1, 0, 0);
+  glRotatef(angle_y, 0, 1, 0);
+  glRotatef(angle_z, 0, 0, 1);
+
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+
+  glVertexPointer(3, GL_INT, 0, vertices);
+  glColorPointer(3, GL_FLOAT, 0, colors);
+
+  glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, faces);
+
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
+
+  glFlush();
+}
 void drawingCube() {
   static GLint vertices[8*8*3] = { 
     // Cube 0
@@ -226,6 +283,7 @@ void drawingCube() {
 
   glRotatef(angle_x, 1, 0, 0);
   glRotatef(angle_y, 0, 1, 0);
+  glRotatef(angle_z, 0, 0, 1);
 
 
   glEnableClientState(GL_VERTEX_ARRAY);
@@ -241,24 +299,65 @@ void drawingCube() {
 
   glFlush();
 }
+void drawingMagicCube(void) {
+
+}
 
 void handleKeyboard(unsigned char key, int x, int y) {
   switch(key) {
     case 'w': 
-      angle_x+=5;
-      glutPostRedisplay();
+      if (angle_y % 90 == 0 && angle_z % 90 == 0) {
+        angle_x+=5;
+        glutPostRedisplay();
+        if (abs(angle_x) % 360 == 0) {
+          angle_x = 0;
+        }
+      }
     break;
     case 's': 
-      angle_x-=5;
-      glutPostRedisplay();
+      if (angle_y % 90 == 0 && angle_z % 90 == 0) {
+        angle_x-=5;
+        glutPostRedisplay();
+        if (abs(angle_x) % 360 == 0) {
+          angle_x = 0;
+        }
+      }
     break;
     case 'a': 
-      angle_y+=5;
-      glutPostRedisplay();
+      if (angle_x % 90 == 0 && angle_z % 90 == 0) {
+        angle_y+=5;
+        glutPostRedisplay();
+        if (abs(angle_y) % 360 == 0) {
+          angle_y = 0;
+        }
+      }
     break;
     case 'd': 
-      angle_y-=5;
-      glutPostRedisplay();
+      if (angle_x % 90 == 0 && angle_z % 90 == 0) {
+        angle_y-=5;
+        glutPostRedisplay();
+        if (abs(angle_y) % 360 == 0) {
+          angle_y = 0;
+        }
+      }
+    break;
+    case 'q': 
+      if (angle_x % 90 == 0 && angle_y % 90 == 0) {
+        angle_z+=5;
+        glutPostRedisplay();
+        if (abs(angle_z) % 360 == 0) {
+          angle_z = 0;
+        }
+      }
+    break;
+    case 'e': 
+      if (angle_x % 90 == 0 && angle_y % 90 == 0) {
+        angle_z-=5;
+        glutPostRedisplay();
+        if (abs(angle_z) % 360 == 0) {
+          angle_z = 0;
+        }
+      }
     break;
     case 27:
       exit(0);
@@ -269,6 +368,8 @@ int main(int argc, char** argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 
+  glutInitWindowSize (SCREEN_WIDTH, SCREEN_HEIGHT); 
+  glutInitWindowPosition (SCREEN_WIDTH/10, SCREEN_WIDTH/10);
   glutCreateWindow("Universal Magic Cube");
 
   glutDisplayFunc(drawingCube);  
