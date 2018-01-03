@@ -1,5 +1,5 @@
 all: 
-	gcc -o cube cube.c -lglut -lGLU -lGL -lm
+	g++ -o cube cube.cpp -lglut -lGLU -lGL -lm 
 
 run:
 	./cube
