@@ -1,3 +1,4 @@
+# include <stdio.h>
 # include <GL/glut.h>
 # define CUBE_DIMENSION 2
 
@@ -5,7 +6,9 @@ const GLfloat edgeLength = 2.0;
 
 int numberOfCubes = CUBE_DIMENSION*CUBE_DIMENSION*CUBE_DIMENSION;
 
-int angle_x = 0, angle_y = 0, angle_z = 0;
+static int left_angle_x = 0, right_angle_x = 0, 
+    top_angle_y = 0, bottom_angle_y = 0,
+    back_angle_z = 0, front_angle_z = 0;
 
 struct RED_rgb {
   static const GLfloat R = 1.0f;
@@ -47,6 +50,7 @@ void startingFieldOfView() {
 
   glMatrixMode(GL_MODELVIEW);
 }
+
 void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ) {
   GLfloat halfEdgeLength = edgeLength * 0.5f;
 
@@ -82,7 +86,6 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ) {
     centerX - halfEdgeLength, centerY - halfEdgeLength, centerZ + halfEdgeLength    // v E 23
   };
   GLubyte faces[6*4] = { 
-    // Cube 0
     0, 1, 2, 3,       // Face BACK
     4, 5, 6, 7,       // Face FRONT
     8, 9, 10, 11,     // Face LEFT
@@ -91,54 +94,66 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ) {
     20, 21, 22, 23    // Face BOTTOM
   };
   GLfloat colors[3*4*6] = { 
-    RED.R, RED.G, RED.B,
-    RED.R, RED.G, RED.B,
-    RED.R, RED.G, RED.B,
-    RED.R, RED.G, RED.B,
-    BLUE.R, BLUE.G, BLUE.B,
-    BLUE.R, BLUE.G, BLUE.B,
-    BLUE.R, BLUE.G, BLUE.B,
-    BLUE.R, BLUE.G, BLUE.B,
-    GREEN.R, GREEN.G, GREEN.B,
-    GREEN.R, GREEN.G, GREEN.B,
-    GREEN.R, GREEN.G, GREEN.B,
-    GREEN.R, GREEN.G, GREEN.B,
-    WHITE.R, WHITE.G, WHITE.B, 
-    WHITE.R, WHITE.G, WHITE.B, 
-    WHITE.R, WHITE.G, WHITE.B, 
-    WHITE.R, WHITE.G, WHITE.B, 
-    BLACK.R, BLACK.G, BLACK.B, 
-    BLACK.R, BLACK.G, BLACK.B, 
-    BLACK.R, BLACK.G, BLACK.B, 
-    BLACK.R, BLACK.G, BLACK.B, 
-    YELLOW.R, YELLOW.G, YELLOW.B, 
-    YELLOW.R, YELLOW.G, YELLOW.B, 
-    YELLOW.R, YELLOW.G, YELLOW.B, 
-    YELLOW.R, YELLOW.G, YELLOW.B
+    RED.R, RED.G, RED.B,      
+    RED.R, RED.G, RED.B,      
+    RED.R, RED.G, RED.B,      
+    RED.R, RED.G, RED.B,      
+    BLUE.R, BLUE.G, BLUE.B,     
+    BLUE.R, BLUE.G, BLUE.B,     
+    BLUE.R, BLUE.G, BLUE.B,     
+    BLUE.R, BLUE.G, BLUE.B,     
+    GREEN.R, GREEN.G, GREEN.B,      
+    GREEN.R, GREEN.G, GREEN.B,      
+    GREEN.R, GREEN.G, GREEN.B,      
+    GREEN.R, GREEN.G, GREEN.B,      
+    WHITE.R, WHITE.G, WHITE.B,      
+    WHITE.R, WHITE.G, WHITE.B,      
+    WHITE.R, WHITE.G, WHITE.B,      
+    WHITE.R, WHITE.G, WHITE.B,      
+    BLACK.R, BLACK.G, BLACK.B,      
+    BLACK.R, BLACK.G, BLACK.B,      
+    BLACK.R, BLACK.G, BLACK.B,      
+    BLACK.R, BLACK.G, BLACK.B,      
+    YELLOW.R, YELLOW.G, YELLOW.B,       
+    YELLOW.R, YELLOW.G, YELLOW.B,       
+    YELLOW.R, YELLOW.G, YELLOW.B,       
+    YELLOW.R, YELLOW.G, YELLOW.B      
   };
-  glLoadIdentity();
 
-  glRotatef(angle_x, 1, 0, 0);
-  glRotatef(angle_y, 0, 1, 0);
-  glRotatef(angle_z, 0, 0, 1);
+  if(centerX > 0){
+    glRotatef(right_angle_x, 1, 0, 0);
+  } else {
+    glRotatef(left_angle_x, 1, 0, 0);
+  }
+  if(centerY > 0){
+    glRotatef(top_angle_y, 0, 1, 0);
+  } else {
+    glRotatef(bottom_angle_y, 0, 1, 0);
+  }
+  if(centerZ > 0){
+    glRotatef(front_angle_z, 0, 0, 1);
+  } else {
+    glRotatef(back_angle_z, 0, 0, 1);
+  }
 
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);
   glVertexPointer(3, GL_FLOAT, 0, vertices);
   glColorPointer(3, GL_FLOAT, 0, colors);
 
-  glDrawElements(GL_QUADS, 72, GL_UNSIGNED_BYTE, faces);
+  glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, faces);
 
   glDisableClientState(GL_COLOR_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
 }
+
 void drawingMagicCube(void) {
   glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   for(int z = -(CUBE_DIMENSION/2); z <= CUBE_DIMENSION/2; z+=2){
     for(int y = -(CUBE_DIMENSION/2); y <= CUBE_DIMENSION/2; y+=2){
       for(int x = -(CUBE_DIMENSION/2); x <= CUBE_DIMENSION/2; x+=2){
-        makeCube((x*edgeLength/2)*1.0f, (y*edgeLength/2)*1.0f, (z*edgeLength/2)*1.0f);
+        makeCube((x*(edgeLength/2))*1.0f, (y*(edgeLength/2))*1.0f, (z*(edgeLength/2))*1.0f);
       }
     }
   }
@@ -166,62 +181,133 @@ int main(int argc, char** argv) {
 
   return 0;
 }
+
 void handleKeyboard(unsigned char key, int x, int y) {
   switch(key) {
-    case 'w': 
-      if (angle_y % 90 == 0 && angle_z % 90 == 0) {
-        angle_x+=5;
+    // X
+    case 'W': 
+      if((top_angle_y % 90 == 0) && (back_angle_z % 90 == 0) && (bottom_angle_y % 90 == 0) && (front_angle_z % 90 == 0)) {
+        left_angle_x += 5;
+        printf("++ Key read: {left_angle_x} %d\n", left_angle_x);
         glutPostRedisplay();
-        if (abs(angle_x) % 360 == 0) {
-          angle_x = 0;
+        if (abs(left_angle_x) % 360 == 0) {
+          left_angle_x = 0;
+        }
+      }
+    break;
+    case 'w': 
+      if((top_angle_y % 90 == 0) && (back_angle_z % 90 == 0) && (bottom_angle_y % 90 == 0) && (front_angle_z % 90 == 0)) {
+        left_angle_x -= 5;
+        printf("++ Key read: {left_angle_x} %d\n", left_angle_x);
+        glutPostRedisplay();
+        if (abs(left_angle_x) % 360 == 0) {
+          left_angle_x = 0;
+        }
+      }
+    break;
+    case 'S': 
+      if((top_angle_y % 90 == 0) && (back_angle_z % 90 == 0) && (bottom_angle_y % 90 == 0) && (front_angle_z % 90 == 0)) {
+        right_angle_x += 5;
+        printf("++ Key read: {right_angle_x} %d\n", right_angle_x);
+        glutPostRedisplay();
+        if (abs(right_angle_x) % 360 == 0) {
+          right_angle_x = 0;
         }
       }
     break;
     case 's': 
-      if (angle_y % 90 == 0 && angle_z % 90 == 0) {
-        angle_x-=5;
+      if((top_angle_y % 90 == 0) && (back_angle_z % 90 == 0) && (bottom_angle_y % 90 == 0) && (front_angle_z % 90 == 0)) {
+        right_angle_x -= 5;
+        printf("++ Key read: {right_angle_x} %d\n", right_angle_x);
         glutPostRedisplay();
-        if (abs(angle_x) % 360 == 0) {
-          angle_x = 0;
+        if (abs(right_angle_x) % 360 == 0) {
+          right_angle_x = 0;
+        }
+      }
+    break;
+    // Y
+    case 'A': 
+      if ((left_angle_x % 90 == 0) && (back_angle_z % 90 == 0) && (right_angle_x % 90 == 0) && (front_angle_z % 90 == 0)) {
+        top_angle_y += 5;
+        printf("++ Key read: {top_angle_y} %d\n", top_angle_y);
+        glutPostRedisplay();
+        if (abs(top_angle_y) % 360 == 0) {
+          top_angle_y = 0;
         }
       }
     break;
     case 'a': 
-      if (angle_x % 90 == 0 && angle_z % 90 == 0) {
-        angle_y+=5;
+      if ((left_angle_x % 90 == 0) && (back_angle_z % 90 == 0) && (right_angle_x % 90 == 0) && (front_angle_z % 90 == 0)) {
+        top_angle_y -= 5;
+        printf("++ Key read: {top_angle_y} %d\n", top_angle_y);
         glutPostRedisplay();
-        if (abs(angle_y) % 360 == 0) {
-          angle_y = 0;
+        if (abs(top_angle_y) % 360 == 0) {
+          top_angle_y = 0;
+        }
+      }
+    break;
+    case 'D': 
+      if ((left_angle_x % 90 == 0) && (back_angle_z % 90 == 0) && (right_angle_x % 90 == 0) && (front_angle_z % 90 == 0)) {
+        bottom_angle_y += 5;
+        printf("++ Key read: {bottom_angle_y} %d\n", bottom_angle_y);
+        glutPostRedisplay();
+        if (abs(bottom_angle_y) % 360 == 0) {
+          bottom_angle_y = 0;
         }
       }
     break;
     case 'd': 
-      if (angle_x % 90 == 0 && angle_z % 90 == 0) {
-        angle_y-=5;
+      if ((left_angle_x % 90 == 0) && (back_angle_z % 90 == 0) && (right_angle_x % 90 == 0) && (front_angle_z % 90 == 0)) {
+        bottom_angle_y -= 5;
+        printf("++ Key read: {bottom_angle_y} %d\n", bottom_angle_y);
         glutPostRedisplay();
-        if (abs(angle_y) % 360 == 0) {
-          angle_y = 0;
+        if (abs(bottom_angle_y) % 360 == 0) {
+          bottom_angle_y = 0;
+        }
+      }
+    break;
+    // Z
+    case 'Q': 
+      if ((left_angle_x % 90 == 0) && (top_angle_y % 90 == 0) && (right_angle_x % 90 == 0) && ( bottom_angle_y % 90 == 0)) {
+        back_angle_z += 5;
+        printf("++ Key read: {back_angle_z} %d\n", back_angle_z);
+        glutPostRedisplay();
+        if (abs(back_angle_z) % 360 == 0) {
+          back_angle_z = 0;
         }
       }
     break;
     case 'q': 
-      if (angle_x % 90 == 0 && angle_y % 90 == 0) {
-        angle_z+=5;
+      if ((left_angle_x % 90 == 0) && (top_angle_y % 90 == 0) && (right_angle_x % 90 == 0) && ( bottom_angle_y % 90 == 0)) {
+        back_angle_z -= 5;
+        printf("++ Key read: {back_angle_z} %d\n", back_angle_z);
         glutPostRedisplay();
-        if (abs(angle_z) % 360 == 0) {
-          angle_z = 0;
+        if (abs(back_angle_z) % 360 == 0) {
+          back_angle_z = 0;
+        }
+      }
+    break;
+    case 'E': 
+      if ((left_angle_x % 90 == 0) && (top_angle_y % 90 == 0) && (right_angle_x % 90 == 0) && ( bottom_angle_y % 90 == 0)) {
+        front_angle_z += 5;
+        printf("++ Key read: {front_angle_z} %d\n", front_angle_z);
+        glutPostRedisplay();
+        if (abs(front_angle_z) % 360 == 0) {
+          front_angle_z = 0;
         }
       }
     break;
     case 'e': 
-      if (angle_x % 90 == 0 && angle_y % 90 == 0) {
-        angle_z-=5;
+      if ((left_angle_x % 90 == 0) && (top_angle_y % 90 == 0) && (right_angle_x % 90 == 0) && ( bottom_angle_y % 90 == 0)) {
+        front_angle_z -= 5;
+        printf("++ Key read: {front_angle_z} %d\n", front_angle_z);
         glutPostRedisplay();
-        if (abs(angle_z) % 360 == 0) {
-          angle_z = 0;
+        if (abs(front_angle_z) % 360 == 0) {
+          front_angle_z = 0;
         }
       }
     break;
+    
     case 27:
       exit(0);
   }
