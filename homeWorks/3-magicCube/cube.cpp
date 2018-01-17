@@ -156,6 +156,7 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
   glDisableClientState(GL_VERTEX_ARRAY);
 
   glPopMatrix();
+  glutSwapBuffers();
 }
 
 void drawingMagicCube(void) {
