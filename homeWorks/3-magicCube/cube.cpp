@@ -47,17 +47,9 @@ void startingFieldOfView() {
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glMatrixMode(GL_MODELVIEW);
 }
-void reshape(int w, int h) {
-   glViewport (0, 0, (GLsizei) w, (GLsizei) h);
-   glMatrixMode (GL_PROJECTION);
-   glLoadIdentity ();
-   glOrtho(-10.0, 10.0, -10.0, 10.0, -5.0, 5.0);
-   glMatrixMode (GL_MODELVIEW);
-}
 
 void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
   GLfloat halfEdgeLength = edgeLength * 0.5f;
-
   GLfloat vertices[3*4*6] = {
     centerX - halfEdgeLength, centerY - halfEdgeLength, centerZ - halfEdgeLength,   // v A 0
     centerX - halfEdgeLength, centerY + halfEdgeLength, centerZ - halfEdgeLength,   // v B 1
@@ -123,6 +115,8 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
     YELLOW.R, YELLOW.G, YELLOW.B,
     YELLOW.R, YELLOW.G, YELLOW.B
   };
+
+  glLoadIdentity();
   glPushMatrix();
 
   if((centerX == 1) && ((centerY == 1 && centerZ == 1) || (centerY == 1 && centerZ == -1) || (centerY == -1 && centerZ == 1) || (centerY == -1 && centerZ == -1))) {
@@ -131,7 +125,7 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
   }
   if((centerX == -1) && ((centerY == 1 && centerZ == 1) || (centerY == 1 && centerZ == -1) || (centerY == -1 && centerZ == 1) || (centerY == -1 && centerZ == -1))) {
     printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t left_angle_x\n", cubeID, centerX, centerY, centerZ);
-    glRotatef(left_angle_x, 1, 0, 0);
+    glRotatef(left_angle_x, -1, 0, 0);
   }
   if((centerY == 1) && ((centerX == 1 && centerZ == 1) || (centerX == 1 && centerZ == -1) || (centerX == -1 && centerZ == 1) || (centerX == -1 && centerZ == -1))) {
     printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t top_angle_y\n", cubeID, centerX, centerY, centerZ);
@@ -139,7 +133,7 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
   }
   if((centerY == -1) && ((centerX == 1 && centerZ == 1) || (centerX == 1 && centerZ == -1) || (centerX == -1 && centerZ == 1) || (centerX == -1 && centerZ == -1))) {
     printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t bottom_angle_y\n", cubeID, centerX, centerY, centerZ);
-    glRotatef(bottom_angle_y, 0, 1, 0);
+    glRotatef(bottom_angle_y, 0, -1, 0);
   }
   if((centerZ == 1) && ((centerX == 1 && centerY == 1) || (centerX == 1 && centerY == -1) || (centerX == -1 && centerY == 1) || (centerX == -1 && centerY == -1))) {
     printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t front_angle_z\n", cubeID, centerX, centerY, centerZ);
@@ -147,7 +141,7 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
   }
   if((centerZ == -1) && ((centerX == 1 && centerY == 1) || (centerX == 1 && centerY == -1) || (centerX == -1 && centerY == 1) || (centerX == -1 && centerY == -1))) {
     printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t back_angle_z\n", cubeID, centerX, centerY, centerZ);
-    glRotatef(back_angle_z, 0, 0, 1);
+    glRotatef(back_angle_z, 0, 0, -1);
   }
 
   glEnableClientState(GL_VERTEX_ARRAY);
@@ -168,7 +162,7 @@ void drawingMagicCube(void) {
   glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   int cubeID = 0;
-  int centerX, centerY, centerZ;
+  double centerX, centerY, centerZ;
   for(int z = -(CUBE_DIMENSION/2); z <= CUBE_DIMENSION/2; z+=2){
     centerZ = (z*(edgeLength/2))*1.0f;
     for(int y = -(CUBE_DIMENSION/2); y <= CUBE_DIMENSION/2; y+=2){
@@ -196,7 +190,6 @@ int main(int argc, char** argv) {
 
   startingFieldOfView();
   glutDisplayFunc(drawingMagicCube);
-  glutReshapeFunc(reshape);
 
   glutKeyboardFunc(handleKeyboard);
   glutMainLoop();
