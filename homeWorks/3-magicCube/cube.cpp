@@ -42,9 +42,17 @@ struct YELLOW_rgb {
 
 void startingFieldOfView() {
   glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
   glOrtho(-10.0, 10.0, -10.0, 10.0, -5.0, 5.0);
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glMatrixMode(GL_MODELVIEW);
+}
+void reshape(int w, int h) {
+   glViewport (0, 0, (GLsizei) w, (GLsizei) h);
+   glMatrixMode (GL_PROJECTION);
+   glLoadIdentity ();
+   glOrtho(-10.0, 10.0, -10.0, 10.0, -5.0, 5.0);
+   glMatrixMode (GL_MODELVIEW);
 }
 
 void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
@@ -115,7 +123,6 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
     YELLOW.R, YELLOW.G, YELLOW.B,
     YELLOW.R, YELLOW.G, YELLOW.B
   };
-  glLoadIdentity();
   glPushMatrix();
 
   if((centerX == 1) && ((centerY == 1 && centerZ == 1) || (centerY == 1 && centerZ == -1) || (centerY == -1 && centerZ == 1) || (centerY == -1 && centerZ == -1))) {
@@ -160,18 +167,19 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
 void drawingMagicCube(void) {
   glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-  glPushMatrix();
   int cubeID = 0;
+  int centerX, centerY, centerZ;
   for(int z = -(CUBE_DIMENSION/2); z <= CUBE_DIMENSION/2; z+=2){
+    centerZ = (z*(edgeLength/2))*1.0f;
     for(int y = -(CUBE_DIMENSION/2); y <= CUBE_DIMENSION/2; y+=2){
+      centerY = (y*(edgeLength/2))*1.0f;
       for(int x = -(CUBE_DIMENSION/2); x <= CUBE_DIMENSION/2; x+=2){
-        makeCube((x*(edgeLength/2))*1.0f, (y*(edgeLength/2))*1.0f, (z*(edgeLength/2))*1.0f,cubeID);
+        centerX = (x*(edgeLength/2))*1.0f;
+        makeCube(centerX, centerY, centerZ, cubeID);
         cubeID++;
       }
     }
   }
-  glPopMatrix();
   glFlush();
 }
 
@@ -184,10 +192,12 @@ int main(int argc, char** argv) {
   glutInitWindowSize (glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));
   glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-640)/2,
                        (glutGet(GLUT_SCREEN_HEIGHT)-480)/2);
-
   glutCreateWindow("Universal Magic Cube");
-  glutDisplayFunc(drawingMagicCube);
+
   startingFieldOfView();
+  glutDisplayFunc(drawingMagicCube);
+  glutReshapeFunc(reshape);
+
   glutKeyboardFunc(handleKeyboard);
   glutMainLoop();
 
