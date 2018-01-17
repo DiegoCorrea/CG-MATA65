@@ -49,7 +49,7 @@ void startingFieldOfView() {
   glMatrixMode(GL_MODELVIEW);
 }
 
-void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ) {
+void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
   GLfloat halfEdgeLength = edgeLength * 0.5f;
 
   GLfloat vertices[3*4*6] = {
@@ -135,6 +135,7 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ) {
   } else {
     glRotatef(back_angle_z, 0, 0, 1);
   }
+  printf("Cube %d: (%0.1f,%0.1f,%0.1f)\n", cubeID, centerX, centerY, centerZ);
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);
   glVertexPointer(3, GL_FLOAT, 0, vertices);
@@ -151,10 +152,12 @@ void drawingMagicCube(void) {
   glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glPushMatrix();
+  int cubeID = 0;
   for(int z = -(CUBE_DIMENSION/2); z <= CUBE_DIMENSION/2; z+=2){
     for(int y = -(CUBE_DIMENSION/2); y <= CUBE_DIMENSION/2; y+=2){
       for(int x = -(CUBE_DIMENSION/2); x <= CUBE_DIMENSION/2; x+=2){
-        makeCube((x*(edgeLength/2))*1.0f, (y*(edgeLength/2))*1.0f, (z*(edgeLength/2))*1.0f);
+        makeCube((x*(edgeLength/2))*1.0f, (y*(edgeLength/2))*1.0f, (z*(edgeLength/2))*1.0f,cubeID);
+        cubeID++;
       }
     }
   }
@@ -187,7 +190,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'W':
       if((top_angle_y % 90 == 0) && (back_angle_z % 90 == 0) && (bottom_angle_y % 90 == 0) && (front_angle_z % 90 == 0)) {
         left_angle_x += rotateAngle;
-        printf("++ Key read: {left_angle_x} %d\n", left_angle_x);
+        printf("\n++ Key read: {left_angle_x} %d\n", left_angle_x);
         if (abs(left_angle_x) % 360 == 0) {
           left_angle_x = 0;
         }
@@ -197,7 +200,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'w':
       if((top_angle_y % 90 == 0) && (back_angle_z % 90 == 0) && (bottom_angle_y % 90 == 0) && (front_angle_z % 90 == 0)) {
         left_angle_x -= rotateAngle;
-        printf("++ Key read: {left_angle_x} %d\n", left_angle_x);
+        printf("\n++ Key read: {left_angle_x} %d\n", left_angle_x);
         if (abs(left_angle_x) % 360 == 0) {
           left_angle_x = 0;
         }
@@ -207,7 +210,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'S':
       if((top_angle_y % 90 == 0) && (back_angle_z % 90 == 0) && (bottom_angle_y % 90 == 0) && (front_angle_z % 90 == 0)) {
         right_angle_x += rotateAngle;
-        printf("++ Key read: {right_angle_x} %d\n", right_angle_x);
+        printf("\n++ Key read: {right_angle_x} %d\n", right_angle_x);
         if (abs(right_angle_x) % 360 == 0) {
           right_angle_x = 0;
         }
@@ -217,7 +220,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 's':
       if((top_angle_y % 90 == 0) && (back_angle_z % 90 == 0) && (bottom_angle_y % 90 == 0) && (front_angle_z % 90 == 0)) {
         right_angle_x -= rotateAngle;
-        printf("++ Key read: {right_angle_x} %d\n", right_angle_x);
+        printf("\n++ Key read: {right_angle_x} %d\n", right_angle_x);
         if (abs(right_angle_x) % 360 == 0) {
           right_angle_x = 0;
         }
@@ -228,7 +231,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'A':
       if ((left_angle_x % 90 == 0) && (back_angle_z % 90 == 0) && (right_angle_x % 90 == 0) && (front_angle_z % 90 == 0)) {
         top_angle_y += rotateAngle;
-        printf("++ Key read: {top_angle_y} %d\n", top_angle_y);
+        printf("\n++ Key read: {top_angle_y} %d\n", top_angle_y);
         if (abs(top_angle_y) % 360 == 0) {
           top_angle_y = 0;
         }
@@ -238,7 +241,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'a':
       if ((left_angle_x % 90 == 0) && (back_angle_z % 90 == 0) && (right_angle_x % 90 == 0) && (front_angle_z % 90 == 0)) {
         top_angle_y -= rotateAngle;
-        printf("++ Key read: {top_angle_y} %d\n", top_angle_y);
+        printf("\n++ Key read: {top_angle_y} %d\n", top_angle_y);
         if (abs(top_angle_y) % 360 == 0) {
           top_angle_y = 0;
         }
@@ -248,7 +251,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'D':
       if ((left_angle_x % 90 == 0) && (back_angle_z % 90 == 0) && (right_angle_x % 90 == 0) && (front_angle_z % 90 == 0)) {
         bottom_angle_y += rotateAngle;
-        printf("++ Key read: {bottom_angle_y} %d\n", bottom_angle_y);
+        printf("\n++ Key read: {bottom_angle_y} %d\n", bottom_angle_y);
         if (abs(bottom_angle_y) % 360 == 0) {
           bottom_angle_y = 0;
         }
@@ -258,7 +261,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'd':
       if ((left_angle_x % 90 == 0) && (back_angle_z % 90 == 0) && (right_angle_x % 90 == 0) && (front_angle_z % 90 == 0)) {
         bottom_angle_y -= rotateAngle;
-        printf("++ Key read: {bottom_angle_y} %d\n", bottom_angle_y);
+        printf("\n++ Key read: {bottom_angle_y} %d\n", bottom_angle_y);
         if (abs(bottom_angle_y) % 360 == 0) {
           bottom_angle_y = 0;
         }
@@ -269,7 +272,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'Q':
       if ((left_angle_x % 90 == 0) && (top_angle_y % 90 == 0) && (right_angle_x % 90 == 0) && ( bottom_angle_y % 90 == 0)) {
         back_angle_z += rotateAngle;
-        printf("++ Key read: {back_angle_z} %d\n", back_angle_z);
+        printf("\n++ Key read: {back_angle_z} %d\n", back_angle_z);
         if (abs(back_angle_z) % 360 == 0) {
           back_angle_z = 0;
         }
@@ -279,7 +282,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'q':
       if ((left_angle_x % 90 == 0) && (top_angle_y % 90 == 0) && (right_angle_x % 90 == 0) && ( bottom_angle_y % 90 == 0)) {
         back_angle_z -= rotateAngle;
-        printf("++ Key read: {back_angle_z} %d\n", back_angle_z);
+        printf("\n++ Key read: {back_angle_z} %d\n", back_angle_z);
         if (abs(back_angle_z) % 360 == 0) {
           back_angle_z = 0;
         }
@@ -289,7 +292,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'E':
       if ((left_angle_x % 90 == 0) && (top_angle_y % 90 == 0) && (right_angle_x % 90 == 0) && ( bottom_angle_y % 90 == 0)) {
         front_angle_z += rotateAngle;
-        printf("++ Key read: {front_angle_z} %d\n", front_angle_z);
+        printf("\n++ Key read: {front_angle_z} %d\n", front_angle_z);
         if (abs(front_angle_z) % 360 == 0) {
           front_angle_z = 0;
         }
@@ -299,7 +302,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
     case 'e':
       if ((left_angle_x % 90 == 0) && (top_angle_y % 90 == 0) && (right_angle_x % 90 == 0) && ( bottom_angle_y % 90 == 0)) {
         front_angle_z -= rotateAngle;
-        printf("++ Key read: {front_angle_z} %d\n", front_angle_z);
+        printf("\n++ Key read: {front_angle_z} %d\n", front_angle_z);
         if (abs(front_angle_z) % 360 == 0) {
           front_angle_z = 0;
         }
