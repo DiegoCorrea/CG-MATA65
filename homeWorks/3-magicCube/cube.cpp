@@ -5,8 +5,6 @@
 const GLfloat edgeLength = 2.0;
 const int rotateAngle = 45;
 
-int numberOfCubes = CUBE_DIMENSION*CUBE_DIMENSION*CUBE_DIMENSION;
-
 int left_angle_x = 0, right_angle_x = 0,
     top_angle_y = 0, bottom_angle_y = 0,
     back_angle_z = 0, front_angle_z = 0;
@@ -120,24 +118,34 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
   glLoadIdentity();
   glPushMatrix();
 
-  if(centerX > 0){
+  if((centerX == 1) && ((centerY == 1 && centerZ == 1) || (centerY == 1 && centerZ == -1) || (centerY == -1 && centerZ == 1) || (centerY == -1 && centerZ == -1))) {
+    printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t right_angle_x\n", cubeID, centerX, centerY, centerZ);
     glRotatef(right_angle_x, 1, 0, 0);
-  } else {
+  }
+  if((centerX == -1) && ((centerY == 1 && centerZ == 1) || (centerY == 1 && centerZ == -1) || (centerY == -1 && centerZ == 1) || (centerY == -1 && centerZ == -1))) {
+    printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t left_angle_x\n", cubeID, centerX, centerY, centerZ);
     glRotatef(left_angle_x, 1, 0, 0);
   }
-  if(centerY > 0){
+  if((centerY == 1) && ((centerX == 1 && centerZ == 1) || (centerX == 1 && centerZ == -1) || (centerX == -1 && centerZ == 1) || (centerX == -1 && centerZ == -1))) {
+    printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t top_angle_y\n", cubeID, centerX, centerY, centerZ);
     glRotatef(top_angle_y, 0, 1, 0);
-  } else {
+  }
+  if((centerY == -1) && ((centerX == 1 && centerZ == 1) || (centerX == 1 && centerZ == -1) || (centerX == -1 && centerZ == 1) || (centerX == -1 && centerZ == -1))) {
+    printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t bottom_angle_y\n", cubeID, centerX, centerY, centerZ);
     glRotatef(bottom_angle_y, 0, 1, 0);
   }
-  if(centerZ > 0){
+  if((centerZ == 1) && ((centerX == 1 && centerY == 1) || (centerX == 1 && centerY == -1) || (centerX == -1 && centerY == 1) || (centerX == -1 && centerY == -1))) {
+    printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t front_angle_z\n", cubeID, centerX, centerY, centerZ);
     glRotatef(front_angle_z, 0, 0, 1);
-  } else {
+  }
+  if((centerZ == -1) && ((centerX == 1 && centerY == 1) || (centerX == 1 && centerY == -1) || (centerX == -1 && centerY == 1) || (centerX == -1 && centerY == -1))) {
+    printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t back_angle_z\n", cubeID, centerX, centerY, centerZ);
     glRotatef(back_angle_z, 0, 0, 1);
   }
-  printf("Cube %d: (%0.1f,%0.1f,%0.1f)\n", cubeID, centerX, centerY, centerZ);
+
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);
+
   glVertexPointer(3, GL_FLOAT, 0, vertices);
   glColorPointer(3, GL_FLOAT, 0, colors);
 
@@ -145,6 +153,7 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
 
   glDisableClientState(GL_COLOR_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
+
   glPopMatrix();
 }
 
