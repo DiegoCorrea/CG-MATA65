@@ -7,7 +7,7 @@ const int rotateAngle = 45;
 
 int numberOfCubes = CUBE_DIMENSION*CUBE_DIMENSION*CUBE_DIMENSION;
 
-static int left_angle_x = 0, right_angle_x = 0,
+int left_angle_x = 0, right_angle_x = 0,
     top_angle_y = 0, bottom_angle_y = 0,
     back_angle_z = 0, front_angle_z = 0;
 
@@ -151,6 +151,7 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
 void drawingMagicCube(void) {
   glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
   glPushMatrix();
   int cubeID = 0;
   for(int z = -(CUBE_DIMENSION/2); z <= CUBE_DIMENSION/2; z+=2){
