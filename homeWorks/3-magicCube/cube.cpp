@@ -116,9 +116,13 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
     YELLOW.R, YELLOW.G, YELLOW.B
   };
 
-  glLoadIdentity();
-  glPushMatrix();
+  glVertexPointer(3, GL_FLOAT, 0, vertices);
+  glColorPointer(3, GL_FLOAT, 0, colors);
 
+  glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, faces);
+}
+
+void makeRotate(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
   if((centerX == 1) && ((centerY == 1 && centerZ == 1) || (centerY == 1 && centerZ == -1) || (centerY == -1 && centerZ == 1) || (centerY == -1 && centerZ == -1))) {
     printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t right_angle_x\n", cubeID, centerX, centerY, centerZ);
     glRotatef(right_angle_x, 1, 0, 0);
@@ -143,38 +147,36 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
     printf("Cube %d: (%0.1f,%0.1f,%0.1f) \t back_angle_z\n", cubeID, centerX, centerY, centerZ);
     glRotatef(back_angle_z, 0, 0, -1);
   }
-
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-
-  glVertexPointer(3, GL_FLOAT, 0, vertices);
-  glColorPointer(3, GL_FLOAT, 0, colors);
-
-  glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, faces);
-
-  glDisableClientState(GL_COLOR_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
-
-  glPopMatrix();
-  glutSwapBuffers();
 }
 
 void drawingMagicCube(void) {
-  glEnable(GL_DEPTH_TEST);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   int cubeID = 0;
   double centerX, centerY, centerZ;
-  for(int z = -(CUBE_DIMENSION/2); z <= CUBE_DIMENSION/2; z+=2){
-    centerZ = (z*(edgeLength/2))*1.0f;
-    for(int y = -(CUBE_DIMENSION/2); y <= CUBE_DIMENSION/2; y+=2){
-      centerY = (y*(edgeLength/2))*1.0f;
-      for(int x = -(CUBE_DIMENSION/2); x <= CUBE_DIMENSION/2; x+=2){
-        centerX = (x*(edgeLength/2))*1.0f;
-        makeCube(centerX, centerY, centerZ, cubeID);
-        cubeID++;
-      }
-    }
-  }
+  glEnable(GL_DEPTH_TEST);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+  glPushMatrix();
+    glEnableClientState(GL_VERTEX_ARRAY);
+      glEnableClientState(GL_COLOR_ARRAY);
+        for(int z = -(CUBE_DIMENSION/2); z <= CUBE_DIMENSION/2; z+=2){
+          centerZ = (z*(edgeLength/2))*1.0f;
+          for(int y = -(CUBE_DIMENSION/2); y <= CUBE_DIMENSION/2; y+=2){
+            centerY = (y*(edgeLength/2))*1.0f;
+            for(int x = -(CUBE_DIMENSION/2); x <= CUBE_DIMENSION/2; x+=2){
+              centerX = (x*(edgeLength/2))*1.0f;
+              glLoadIdentity();
+              glPushMatrix();
+                makeRotate(centerX, centerY, centerZ, cubeID);
+                makeCube(centerX, centerY, centerZ, cubeID);
+              glPopMatrix();
+              glutSwapBuffers();
+              cubeID++;
+            }
+          }
+        }
+      glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+  glPushMatrix();
   glFlush();
 }
 
