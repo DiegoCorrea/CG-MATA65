@@ -29,11 +29,11 @@ struct BLUE_rgb {
   static constexpr GLfloat G = 0.49f;
   static constexpr GLfloat B = 0.95f;
 } BLUE;
-struct WHITE_rgb {
+struct LILAC_rgb {
   static constexpr GLfloat R = 0.63f;
   static constexpr GLfloat G = 0.13f;
   static constexpr GLfloat B = 0.94f;
-} WHITE;
+} LILAC;
 struct YELLOW_rgb {
   static constexpr GLfloat R = 0.93f;
   static constexpr GLfloat G = 0.93f;
@@ -102,10 +102,10 @@ void makeCube(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
     GREEN.R, GREEN.G, GREEN.B,
     GREEN.R, GREEN.G, GREEN.B,
     GREEN.R, GREEN.G, GREEN.B,
-    WHITE.R, WHITE.G, WHITE.B,
-    WHITE.R, WHITE.G, WHITE.B,
-    WHITE.R, WHITE.G, WHITE.B,
-    WHITE.R, WHITE.G, WHITE.B,
+    LILAC.R, LILAC.G, LILAC.B,
+    LILAC.R, LILAC.G, LILAC.B,
+    LILAC.R, LILAC.G, LILAC.B,
+    LILAC.R, LILAC.G, LILAC.B,
     BLACK.R, BLACK.G, BLACK.B,
     BLACK.R, BLACK.G, BLACK.B,
     BLACK.R, BLACK.G, BLACK.B,
@@ -148,7 +148,9 @@ void makeRotate(GLfloat centerX, GLfloat centerY, GLfloat centerZ, int cubeID) {
     glRotatef(back_angle_z, 0, 0, -1);
   }
 }
+void choiceRotate(centerX, centerY, centerZ, cubeID) {
 
+}
 void drawingMagicCube(void) {
   int cubeID = 0;
   double centerX, centerY, centerZ;
@@ -166,6 +168,7 @@ void drawingMagicCube(void) {
               centerX = (x*(edgeLength/2))*1.0f;
               glLoadIdentity();
               glPushMatrix();
+                //choiceRotate(centerX, centerY, centerZ, cubeID);
                 makeRotate(centerX, centerY, centerZ, cubeID);
                 makeCube(centerX, centerY, centerZ, cubeID);
               glPopMatrix();
