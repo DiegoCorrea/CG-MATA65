@@ -12,9 +12,8 @@ void reshapeWindow(int w, int h);
 void handleKeyboard(unsigned char key, int x, int y);
 void readEntry(int argc, char** argv);
 int main(int argc, char** argv) {
-
-    /*
     readEntry(argc, argv);
+    /*
     initWindow(argc, argv);
 
     glutDisplayFunc(display);
@@ -41,7 +40,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
       glutPostRedisplay();
     break;
     case 27:
-      exit(0);
+      exit(EXIT_SUCCESS);
   }
 }
 
@@ -74,6 +73,14 @@ void reshapeWindow(int w, int h) {
 }
 /******************************************************************************/
 
-void readEntry(int argc, char** argv) {
-
+void readEntry(int argc, char* argv[]) {
+  if( argc == 1) {
+    printf("Um arquivo de entrada é necessario\n");
+    exit(EXIT_FAILURE);
+  }
+  FILE *fl_input;
+  fl_input = fopen(argv[1], "r" );
+  fscanf(fl_input, "%d %d", &DIMENSION_Y, &DIMENSION_X);
+  fclose( fl_input );
+  printf("DIMENSION X: %d -- DIMENSION Y: %d\n",DIMENSION_X,DIMENSION_Y );
 }
