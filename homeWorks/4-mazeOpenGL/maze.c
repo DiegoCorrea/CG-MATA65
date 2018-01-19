@@ -1,40 +1,65 @@
+# include <stdio.h>
 # include <GL/gl.h>
 # include <GL/glu.h>
 # include <GL/glut.h>
 
-int lightPosition_z = 0;
-int lightPosition_x = 0;
-const int angleRotate = 45;
-GLfloat light_position[] = { 1.0, 1.0, 0.0, 0.0 };
+int DIMENSION_X = 0, DIMENSION_Y = 0;
+int *MAP;
+int PERSON_X = 0, PERSON_Y = 0;
 
-void init(void) {
-   GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-   GLfloat mat_shininess[] = { 50.0 };
+void initWindow(int argc, char* argv[]);
+void reshapeWindow(int w, int h);
+void handleKeyboard(unsigned char key, int x, int y);
+void readEntry(int argc, char** argv);
+int main(int argc, char** argv) {
 
-   glClearColor (0.0, 0.0, 0.0, 0.0);
-   glShadeModel (GL_SMOOTH);
+    /*
+    readEntry(argc, argv);
+    initWindow(argc, argv);
 
-   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    glutDisplayFunc(display);
+    glutKeyboardFunc(handleKeyboard);
 
-   glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
-   glEnable(GL_DEPTH_TEST);
+    glutMainLoop();
+    */
+
+    exit(EXIT_SUCCESS);
+}
+/******************************************************************************/
+void handleKeyboard(unsigned char key, int x, int y) {
+  switch (key) {
+    case 'a':
+      glutPostRedisplay();
+    break;
+    case 'd':
+      glutPostRedisplay();
+    break;
+    case 'w':
+      glutPostRedisplay();
+    break;
+    case 's':
+      glutPostRedisplay();
+    break;
+    case 27:
+      exit(0);
+  }
 }
 
-void display(void) {
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   glLoadIdentity();
-   glPushMatrix();
-        glRotatef(lightPosition_z, 0, 0, 1);
-        glRotatef(lightPosition_x, 1, 0, 0);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-      glPopMatrix();
-     glutSolidSphere (1.0, 20, 16);
-   glFlush();
+void initWindow(int argc, char* argv[]) {
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+
+  glutInitWindowSize (glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));
+  glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-640)/2,
+                      (glutGet(GLUT_SCREEN_HEIGHT)-480)/2);
+
+  if(glutCreateWindow("Maze - The Hunter") < 1) {
+    exit(EXIT_FAILURE);
+  }
+  glutReshapeFunc(reshapeWindow);
 }
 
-void reshape(int w, int h) {
+void reshapeWindow(int w, int h) {
    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
@@ -47,47 +72,8 @@ void reshape(int w, int h) {
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
 }
+/******************************************************************************/
 
-void handleKeyboard(unsigned char key, int x, int y);
-int main(int argc, char** argv) {
-   glutInit(&argc, argv);
-   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+void readEntry(int argc, char** argv) {
 
-   glutInitWindowSize (glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));
-   glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-640)/2,
-                        (glutGet(GLUT_SCREEN_HEIGHT)-480)/2);
-   glutCreateWindow("Maze - The Hunter");
-
-   init();
-
-   glutDisplayFunc(display);
-   glutReshapeFunc(reshape);
-
-   glutKeyboardFunc(handleKeyboard);
-
-   glutMainLoop();
-   return 0;
-}
-
-void handleKeyboard(unsigned char key, int x, int y) {
-  switch (key) {
-    case 'a':
-      lightPosition_z += angleRotate;
-      glutPostRedisplay();
-    break;
-    case 'd':
-      lightPosition_z -= angleRotate;
-      glutPostRedisplay();
-    break;
-    case 'w':
-      lightPosition_x += angleRotate;
-      glutPostRedisplay();
-    break;
-    case 's':
-      lightPosition_x -= angleRotate;
-      glutPostRedisplay();
-    break;
-    case 27:
-      exit(0);
-  }
 }
