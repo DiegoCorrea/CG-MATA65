@@ -4,7 +4,7 @@
 # include <GL/glut.h>
 
 int DIMENSION_X = 0, DIMENSION_Y = 0;
-int *MAP;
+int **MAP;
 int PERSON_X = 0, PERSON_Y = 0;
 
 void initWindow(int argc, char* argv[]);
@@ -12,17 +12,21 @@ void reshapeWindow(int w, int h);
 void handleKeyboard(unsigned char key, int x, int y);
 void readEntry(int argc, char** argv);
 int main(int argc, char** argv) {
-    readEntry(argc, argv);
-    /*
-    initWindow(argc, argv);
+  if(argc == 1) {
+    printf("Um arquivo de entrada é necessario\n");
+    exit(EXIT_FAILURE);
+  }
+  readEntry(argc, argv);
+  /*
+  initWindow(argc, argv);
 
-    glutDisplayFunc(display);
-    glutKeyboardFunc(handleKeyboard);
+  glutDisplayFunc(display);
+  glutKeyboardFunc(handleKeyboard);
 
-    glutMainLoop();
-    */
+  glutMainLoop();
+  */
 
-    exit(EXIT_SUCCESS);
+  exit(EXIT_SUCCESS);
 }
 /******************************************************************************/
 void handleKeyboard(unsigned char key, int x, int y) {
@@ -74,13 +78,22 @@ void reshapeWindow(int w, int h) {
 /******************************************************************************/
 
 void readEntry(int argc, char* argv[]) {
-  if( argc == 1) {
-    printf("Um arquivo de entrada é necessario\n");
-    exit(EXIT_FAILURE);
-  }
   FILE *fl_input;
   fl_input = fopen(argv[1], "r" );
+
   fscanf(fl_input, "%d %d", &DIMENSION_Y, &DIMENSION_X);
-  fclose( fl_input );
   printf("DIMENSION X: %d -- DIMENSION Y: %d\n",DIMENSION_X,DIMENSION_Y );
+
+  MAP = (int **) malloc(DIMENSION_Y * sizeof(int *));
+  for (int i = 0; i < DIMENSION_Y; i++) {
+    MAP[i] = (int *) malloc(DIMENSION_X * sizeof(int));
+    for(int j = 0, bufferFile = 0; j < DIMENSION_X; j++) {
+      fscanf(fl_input, "%d ", &bufferFile);
+      printf("%d ", bufferFile);
+      MAP[i][j] = bufferFile;
+    }
+    printf("\n");
+  }
+
+  fclose( fl_input );
 }
