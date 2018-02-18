@@ -200,11 +200,23 @@ void createSideWallBlock(double x, double y, double z){
     glVertex3f(x, y + edgeLength, z);
   glEnd();
 
+  glBegin(GL_QUADS);
+    glVertex3f(x, y, z);
+    glVertex3f(x, y + edgeLength, z);
+    glVertex3f(x + edgeLength, y + edgeLength, z);
+    glVertex3f(x + edgeLength, y, z);
+  glEnd();
+
   printf("----- { Create Side Wall Block } -----\n");
   printf("(%f, %f, %f)\n", x, y, z);
   printf("(%f, %f, %f)\n", x + edgeLength, y, z);
   printf("(%f, %f, %f)\n", x + edgeLength, y + edgeLength, z);
   printf("(%f, %f, %f)\n", x, y + edgeLength, z);
+  printf("----- -----\n");
+  printf("(%f, %f, %f)\n", x, y, z);
+  printf("(%f, %f, %f)\n", x, y + edgeLength, z);
+  printf("(%f, %f, %f)\n", x + edgeLength, y + edgeLength, z);
+  printf("(%f, %f, %f)\n", x + edgeLength, y, z);  
   printf("----- -----\n\n");
 }
 
@@ -218,11 +230,23 @@ void createDownWallBlock(double x, double y, double z){
     glVertex3f(x, y, z + edgeLength);
   glEnd();
 
+  glBegin(GL_QUADS);
+    glVertex3f(x, y, z);
+    glVertex3f(x, y, z + edgeLength);
+    glVertex3f(x, y + edgeLength, z + edgeLength);
+    glVertex3f(x, y + edgeLength, z);
+  glEnd();
+
   printf("----- { Create Down Wall Block } -----\n");
   printf("(%f, %f, %f)\n", x, y, z);
   printf("(%f, %f, %f)\n", x, y + edgeLength, z);
   printf("(%f, %f, %f)\n", x, y + edgeLength, z + edgeLength);
   printf("(%f, %f, %f)\n", x, y, z + edgeLength);  
+  printf("----- -----\n");
+  printf("(%f, %f, %f)\n", x, y, z);
+  printf("(%f, %f, %f)\n", x, y, z + edgeLength);
+  printf("(%f, %f, %f)\n", x, y + edgeLength, z + edgeLength);
+  printf("(%f, %f, %f)\n", x, y + edgeLength, z);  
   printf("----- -----\n\n");
 }
 
@@ -230,8 +254,8 @@ void makeWall(){
   printf("--------------------------------\n");
   printf("============= WALL =============\n");
   printf("--------------------------------\n");
-  for(double z = 0.0; z < (DIMENSION_Z - 1); z += 1.0) {
-    for(double x = 0.0; x < (DIMENSION_X - 1); x += 1.0) {
+  for(double z = 0.0; z < DIMENSION_Z; z += 1.0) {
+    for(double x = 0.0; x < DIMENSION_X ; x += 1.0) {
       if ((int)(x+1.0) < DIMENSION_X && MAP[(int)z][(int)x] == WALL && MAP[(int)z][(int)x+1] == WALL){
         createSideWallBlock(x, 0.0, z);
       }
@@ -276,15 +300,13 @@ void makeRoof(){
 void makeWorld(){
   glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //makeWall();
+    makeWall();
     makeFloor();
-    /*
     if (!MAP_VIEW_MODE) {
       makeRoof();
       glLoadIdentity();
       gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X, edgeLength/2, PERSON_Z + viewDistance, 0, 1, 0);
       glutPostRedisplay();
     }
-    */
   glFlush();
 }
