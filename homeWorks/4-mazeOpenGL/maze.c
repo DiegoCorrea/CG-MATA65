@@ -3,14 +3,20 @@
 # include <GL/glu.h>
 # include <GL/glut.h>
 # include <stdbool.h>
+# include "load_texture.h"
 
 int DIMENSION_X = 0, DIMENSION_Z = 0;
 int **MAP;
-double PERSON_X = 0.0, PERSON_Z = 2.0;
+
+double PERSON_X = 0.0, PERSON_Z = 0.0;
+
 double edgeLength = 1.0;
 double viewDistance = 5.0;
+
 bool MAP_VIEW_MODE = false;
 int WALL = 1, PLAYER = 2, EXIT_GAME = 3, FLOOR = 4;
+
+GLuint WALL_IMG, FLOOR_IMG, ROOF_IMG;
 
 void initWindow(int argc, char* argv[]);
 void startingFieldOfView();
@@ -36,10 +42,17 @@ int main(int argc, char** argv) {
   readEntry(argc, argv);
 
   initWindow(argc, argv);
-  startingFieldOfView();
+
+  WALL_IMG = loadBMP("wall.bmp");
+
+  FLOOR_IMG = loadBMP("floor.bmp");
+  
+  ROOF_IMG = loadBMP("roof.bmp");
 
   glutDisplayFunc(makeWorld);
   glutKeyboardFunc(handleKeyboard);
+
+  startingFieldOfView();
 
   glutMainLoop();
 
@@ -126,10 +139,13 @@ void startingFieldOfView() {
 
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
+  glEnable(GL_TEXTURE_2D);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
   glMatrixMode(GL_MODELVIEW);
 
-  glLoadIdentity();
-  gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X, edgeLength/2, PERSON_Z + viewDistance, 0, 1, 0);
+  glEnable(GL_DEPTH_TEST);
 }
 /* **************************************************************************** */
 
@@ -161,12 +177,16 @@ void readEntry(int argc, char* argv[]) {
 
 // --------------------- FLOOR ---------------------//
 void createFloorBlock(double x, double y, double z) {
-  glColor3f(0.0, 0.56, 1.0);
+  GLuint textureID = FLOOR_IMG;
 
   glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0);
     glVertex3f(x, y, z);
+    glTexCoord2f(0.0, 1.0);
     glVertex3f(x, y, z + edgeLength);
+    glTexCoord2f(1.0, 1.0);
     glVertex3f(x + edgeLength, y, z + edgeLength);
+    glTexCoord2f(1.0, 0.0);
     glVertex3f(x + edgeLength, y, z);
   glEnd();
 
@@ -190,20 +210,28 @@ void makeFloor() {
 }
 
 // --------------------- WALL ---------------------//
-void createSideWallBlock(double x, double y, double z){
-  glColor3f(1.0, 0.56, 0.0);
+void createSideWallBlock(double x, double y, double z) {
+  GLuint textureID = WALL_IMG;
 
   glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0);
     glVertex3f(x, y, z);
+    glTexCoord2f(1.0, 0.0);
     glVertex3f(x + edgeLength, y, z);
+    glTexCoord2f(1.0, 1.0);
     glVertex3f(x + edgeLength, y + edgeLength, z);
+    glTexCoord2f(0.0, 1.0);
     glVertex3f(x, y + edgeLength, z);
   glEnd();
 
   glBegin(GL_QUADS);
+  glTexCoord2f(0.0, 0.0);
     glVertex3f(x, y, z);
+    glTexCoord2f(0.0, 1.0);
     glVertex3f(x, y + edgeLength, z);
+    glTexCoord2f(1.0, 1.0);
     glVertex3f(x + edgeLength, y + edgeLength, z);
+    glTexCoord2f(1.0, 0.0);
     glVertex3f(x + edgeLength, y, z);
   glEnd();
 
@@ -220,20 +248,29 @@ void createSideWallBlock(double x, double y, double z){
   printf("----- -----\n\n");
 }
 
-void createDownWallBlock(double x, double y, double z){
-  glColor3f(1.0, 0.56, 0.0);
+void createDownWallBlock(double x, double y, double z) {
+  GLuint textureID = WALL_IMG;
+
 
   glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0);
     glVertex3f(x, y, z);
+    glTexCoord2f(0.0, 1.0);
     glVertex3f(x, y + edgeLength, z);
+    glTexCoord2f(1.0, 1.0);
     glVertex3f(x, y + edgeLength, z + edgeLength);
+    glTexCoord2f(1.0, 0.0);
     glVertex3f(x, y, z + edgeLength);
   glEnd();
 
   glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0);
     glVertex3f(x, y, z);
+    glTexCoord2f(1.0, 0.0);
     glVertex3f(x, y, z + edgeLength);
+    glTexCoord2f(1.0, 1.0);
     glVertex3f(x, y + edgeLength, z + edgeLength);
+    glTexCoord2f(0.0, 1.0);
     glVertex3f(x, y + edgeLength, z);
   glEnd();
 
@@ -256,7 +293,7 @@ void makeWall(){
   printf("--------------------------------\n");
   for(double z = 0.0; z < DIMENSION_Z; z += 1.0) {
     for(double x = 0.0; x < DIMENSION_X ; x += 1.0) {
-      if ((int)(x+1.0) < DIMENSION_X && MAP[(int)z][(int)x] == WALL && MAP[(int)z][(int)x+1] == WALL){
+      if ((int)(x+1.0) < DIMENSION_X && MAP[(int)z][(int)x] == WALL && MAP[(int)z][(int)x+1] == WALL) {
         createSideWallBlock(x, 0.0, z);
       }
       if ((int)(z+1.0) < DIMENSION_Z && MAP[(int)z][(int)x] == WALL && MAP[(int)z+1][(int)x] == WALL) {
@@ -267,13 +304,17 @@ void makeWall(){
 }
 
 // --------------------- ROOF ---------------------//
-void createRoofBlock(double x, double y, double z){
-  glColor3f(1.0, 0.56, 0.0);
+void createRoofBlock(double x, double y, double z) {
+  GLuint textureID = ROOF_IMG;
 
   glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0);
     glVertex3f(x, y, z);
+    glTexCoord2f(1.0, 0.0);
     glVertex3f(x + edgeLength, y, z);
+    glTexCoord2f(1.0, 1.0);
     glVertex3f(x + edgeLength, y, z + edgeLength);
+    glTexCoord2f(0.0, 1.0);
     glVertex3f(x, y, z + edgeLength);
   glEnd();
 
@@ -285,7 +326,7 @@ void createRoofBlock(double x, double y, double z){
   printf("----- -----\n\n");
 }
 
-void makeRoof(){
+void makeRoof() {
   printf("--------------------------------\n");
   printf("============= ROOF =============\n");
   printf("--------------------------------\n");
@@ -296,17 +337,20 @@ void makeRoof(){
   }
 }
 
+// --------------------- PLAYER LOCATION ---------------------//
+void createPlayerSphere() {
+  
+}
+
 // --------------------- Maze The Devil ---------------------//
 void makeWorld(){
-  glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    makeWall();
-    makeFloor();
+  glLoadIdentity();
     if (!MAP_VIEW_MODE) {
+      gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, 0, 0, PERSON_Z + viewDistance, 0, 1, 0);
       makeRoof();
-      glLoadIdentity();
-      gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X, edgeLength/2, PERSON_Z + viewDistance, 0, 1, 0);
-      glutPostRedisplay();
     }
+    makeFloor();
+    makeWall();
   glFlush();
 }
