@@ -30,7 +30,7 @@ void handleKeyboard(unsigned char key, int x, int y);
 
 void readEntry(int argc, char** argv);
 
-bool wallShock();
+bool wallSideShock();
 
 void createFlorBlock(double x, double y, double z);
 void createSideWallBlock(double x, double y, double z);
@@ -68,8 +68,6 @@ int main(int argc, char** argv) {
 }
 /******************************************************************************/
 void SpecialKeys(int key, int x, int y) {
-  if (wallShock())
-    return;
   switch (key) {
     case GLUT_KEY_LEFT:
       PERSON_X -= MOVIMENT;
@@ -379,15 +377,14 @@ void makeWorld(){
 }
 
 // -------------------------------------------------------
-bool wallShock(){
-  if(PERSON_X >= DIMENSION_X || PERSON_X < 0.0 || PERSON_Z >= DIMENSION_Z || PERSON_Z < 0.0)
+
+bool wallSideShock(double newPosition_x){
+  if(newPosition_x >= DIMENSION_X -1 || newPosition_x <= 0.0)
     return true;
-  if ((fmod((PERSON_X + MOVIMENT), 1.0) == 0.0 || fmod((PERSON_X - MOVIMENT), 1.0) == 0.0) && (MAP[(int)(PERSON_Z/1)][(int)(PERSON_X + MOVIMENT)] == WALL && MAP[(int)(PERSON_Z/1)+1][(int)(PERSON_X + MOVIMENT)] == WALL)) {
-    
+  if ((fmod((newPosition_x), 1.0) == 0.0) && (MAP[(int)(PERSON_Z/1)][(int)(newPosition_x)] == WALL && MAP[(int)(PERSON_Z/1)+1][(int)(newPosition_x)] == WALL)) {
+    return true;
   }
-  if (fmod(PERSON_Z + MOVIMENT, 1.0) == 0.0 || fmod(PERSON_Z - MOVIMENT, 1.0) == 0.0) {
-    
-  }
+  return false; 
 }
 
 
