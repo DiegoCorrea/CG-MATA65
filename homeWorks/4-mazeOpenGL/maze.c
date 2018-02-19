@@ -21,7 +21,11 @@ GLuint WALL_IMG, FLOOR_IMG, ROOF_IMG;
 void initWindow(int argc, char* argv[]);
 void startingFieldOfView();
 void reshapeWindow(int w, int h);
+
+void SpecialKeys(int key, int x, int y);
 void handleKeyboard(unsigned char key, int x, int y);
+
+
 void readEntry(int argc, char** argv);
 
 
@@ -51,6 +55,7 @@ int main(int argc, char** argv) {
 
   glutDisplayFunc(makeWorld);
   glutKeyboardFunc(handleKeyboard);
+  glutSpecialFunc(SpecialKeys);
 
   startingFieldOfView();
 
@@ -59,42 +64,46 @@ int main(int argc, char** argv) {
   exit(EXIT_SUCCESS);
 }
 /******************************************************************************/
-void handleKeyboard(unsigned char key, int x, int y) {
+void SpecialKeys(int key, int x, int y) {
   switch (key) {
-    case 'a':
+    case GLUT_KEY_LEFT:
       PERSON_X -= 0.1;
       glLoadIdentity();
       gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X, edgeLength/2, PERSON_Z + viewDistance, 0, 1, 0);
       glutPostRedisplay();
     break;
-    case 'd':
+    case GLUT_KEY_RIGHT:
       PERSON_X += 0.1;
       glLoadIdentity();
       gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X, edgeLength/2, PERSON_Z + viewDistance, 0, 1, 0);
       glutPostRedisplay();
     break;
-    case 'w':
+    case GLUT_KEY_UP:
       PERSON_Z += 0.1;
       glLoadIdentity();
       gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X + viewDistance, edgeLength/2, PERSON_Z, 0, 1, 0);
       glutPostRedisplay();
     break;
-    case 's':
+    case GLUT_KEY_DOWN:
       PERSON_Z -= 0.1;
       glLoadIdentity();
       gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X + viewDistance, edgeLength/2, PERSON_Z, 0, 1, 0);
       glutPostRedisplay();
     break;
+  }
+}
+
+void handleKeyboard(unsigned char key, int x, int y) {
+  switch (key) {
     case 'v':
       if (MAP_VIEW_MODE){
         MAP_VIEW_MODE = false;
         glLoadIdentity();
-        gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X, edgeLength/2, PERSON_Z + viewDistance, 0, 1, 0);
+        gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X, edgeLength/2, PERSON_Z, 0, 1, 0);
         glutPostRedisplay();
       } else {
         MAP_VIEW_MODE = true;
-        glLoadIdentity();
-        gluLookAt((DIMENSION_X/2.0), ((edgeLength*10.0)/2.0), (DIMENSION_Z/2.0), (DIMENSION_X/2.0), 0.0, (DIMENSION_Z/2.0), 0, 0, DIMENSION_Z/2.0);
+        gluLookAt((DIMENSION_X/2.0), (edgeLength*10.0), (DIMENSION_Z/2.0), PERSON_X, edgeLength/2.0, PERSON_Z, 1, 0, 0);
         glutPostRedisplay();
       }
     break;
@@ -339,18 +348,27 @@ void makeRoof() {
 
 // --------------------- PLAYER LOCATION ---------------------//
 void createPlayerSphere() {
-  
+  glPushMatrix();
+    glTranslatef(PERSON_X, edgeLength/2.0, PERSON_Z);
+    glColor3f(0.0, 0.7, 0.0);
+    glutSolidSphere(1.0, 5, 4);
+  glPopMatrix();
 }
 
 // --------------------- Maze The Devil ---------------------//
 void makeWorld(){
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
+  glPushMatrix();
     if (!MAP_VIEW_MODE) {
       gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, 0, 0, PERSON_Z + viewDistance, 0, 1, 0);
       makeRoof();
+    } else {
+      createPlayerSphere();
     }
     makeFloor();
     makeWall();
+  glPopMatrix();
+  glutSwapBuffers();
   glFlush();
 }
