@@ -3,12 +3,14 @@
 # include <GL/glu.h>
 # include <GL/glut.h>
 # include <stdbool.h>
+# include <math.h>
 # include "load_texture.h"
 
 int DIMENSION_X = 0, DIMENSION_Z = 0;
 int **MAP;
 
 double PERSON_X = 0.0, PERSON_Z = 0.0;
+double MOVIMENT = 0.1;
 
 double edgeLength = 1.0;
 double viewDistance = 5.0;
@@ -28,6 +30,7 @@ void handleKeyboard(unsigned char key, int x, int y);
 
 void readEntry(int argc, char** argv);
 
+bool wallShock();
 
 void createFlorBlock(double x, double y, double z);
 void createSideWallBlock(double x, double y, double z);
@@ -65,27 +68,29 @@ int main(int argc, char** argv) {
 }
 /******************************************************************************/
 void SpecialKeys(int key, int x, int y) {
+  if (wallShock())
+    return;
   switch (key) {
     case GLUT_KEY_LEFT:
-      PERSON_X -= 0.1;
+      PERSON_X -= MOVIMENT;
       glLoadIdentity();
       gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X, edgeLength/2, PERSON_Z + viewDistance, 0, 1, 0);
       glutPostRedisplay();
     break;
     case GLUT_KEY_RIGHT:
-      PERSON_X += 0.1;
+      PERSON_X += MOVIMENT;
       glLoadIdentity();
       gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X, edgeLength/2, PERSON_Z + viewDistance, 0, 1, 0);
       glutPostRedisplay();
     break;
     case GLUT_KEY_UP:
-      PERSON_Z += 0.1;
+      PERSON_Z += MOVIMENT;
       glLoadIdentity();
       gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X + viewDistance, edgeLength/2, PERSON_Z, 0, 1, 0);
       glutPostRedisplay();
     break;
     case GLUT_KEY_DOWN:
-      PERSON_Z -= 0.1;
+      PERSON_Z -= MOVIMENT;
       glLoadIdentity();
       gluLookAt(PERSON_X, edgeLength/2, PERSON_Z, PERSON_X + viewDistance, edgeLength/2, PERSON_Z, 0, 1, 0);
       glutPostRedisplay();
@@ -372,3 +377,54 @@ void makeWorld(){
   glutSwapBuffers();
   glFlush();
 }
+
+// -------------------------------------------------------
+bool wallShock(){
+  if(PERSON_X >= DIMENSION_X || PERSON_X <= 0.0 || PERSON_Z >= DIMENSION_Z || PERSON_Z <= 0.0)
+    return true;
+  if ((fmod((PERSON_X + MOVIMENT), 1.0) == 0.0 || fmod((PERSON_X - MOVIMENT), 1.0) == 0.0) && (MAP[(int)(PERSON_Z/1)][(int)(PERSON_X + MOVIMENT)] == WALL && MAP[(int)(PERSON_Z/1)+1][(int)(PERSON_X + MOVIMENT)] == WALL)) {
+    
+  }
+  if (fmod(PERSON_Z + MOVIMENT, 1.0) == 0.0 || fmod(PERSON_Z - MOVIMENT, 1.0) == 0.0) {
+    
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
