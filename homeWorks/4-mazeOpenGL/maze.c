@@ -380,7 +380,7 @@ void makeWorld(){
 
 // -------------------------------------------------------
 bool wallShock(){
-  if(PERSON_X >= DIMENSION_X || PERSON_X <= 0.0 || PERSON_Z >= DIMENSION_Z || PERSON_Z <= 0.0)
+  if(PERSON_X >= DIMENSION_X || PERSON_X < 0.0 || PERSON_Z >= DIMENSION_Z || PERSON_Z < 0.0)
     return true;
   if ((fmod((PERSON_X + MOVIMENT), 1.0) == 0.0 || fmod((PERSON_X - MOVIMENT), 1.0) == 0.0) && (MAP[(int)(PERSON_Z/1)][(int)(PERSON_X + MOVIMENT)] == WALL && MAP[(int)(PERSON_Z/1)+1][(int)(PERSON_X + MOVIMENT)] == WALL)) {
     
