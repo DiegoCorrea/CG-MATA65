@@ -26,13 +26,23 @@ struct Player {
   double obj_x;
   double obj_y;
   double obj_z;
+
+  double color_R;
+  double color_G;
+  double color_B;
+  double color_opacity;
 } PLAYER;
 
 struct Sun {
   double light_x;
   double light_y;
   double light_z;
-  double opacity;
+  double light_opacity;
+
+  double color_R;
+  double color_G;
+  double color_B;
+  double color_opacity;
 } SUN;
 
 struct Texture {
@@ -50,6 +60,7 @@ void handleKeyboard(unsigned char key, int x, int y);
 
 void loadTexture();
 void readEntry(int argc, char** argv);
+void setVariables();
 
 bool wallSideShock();
 
@@ -73,8 +84,12 @@ int main(int argc, char** argv) {
   }
   readEntry(argc, argv);
 
+  setVariables();
+
   initWindow(argc, argv);
-  
+
+  startingFieldOfView();
+
   loadTexture();
 
   glutDisplayFunc(makeWorld);
@@ -82,45 +97,54 @@ int main(int argc, char** argv) {
   glutKeyboardFunc(handleKeyboard);
   glutSpecialFunc(SpecialKeys);
 
-  startingFieldOfView();
-
   glutMainLoop();
 
   exit(EXIT_SUCCESS);
 }
 /******************************************************************************/
+void readEntry(int argc, char* argv[]) {
+  FILE *fl_input;
+  fl_input = fopen(argv[1], "r" );
+
+  fscanf(fl_input, "%d %d", &DIMENSION_Z, &DIMENSION_X);
+
+  MAP = (int **) malloc(DIMENSION_Z * sizeof(int *));
+  for(int i = 0; i < DIMENSION_Z; i++) {
+    MAP[i] = (int *) malloc(DIMENSION_X * sizeof(int));
+    for(int j = 0, bufferFile = 0; j < DIMENSION_X; j++) {
+      fscanf(fl_input, "%d ", &bufferFile);
+      MAP[i][j] = bufferFile;
+    }
+  }
+  fclose( fl_input );
+}
 
 void initWindow(int argc, char* argv[]) {
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+  
+  glutInitDisplayMode(
+    GLUT_SINGLE
+    | GLUT_RGB
+    | GLUT_DEPTH
+  );
 
-  glutInitWindowSize (glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));
-  glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-640)/2,
-                      (glutGet(GLUT_SCREEN_HEIGHT)-480)/2);
+  glutInitWindowSize(
+    glutGet(GLUT_SCREEN_WIDTH),
+    glutGet(GLUT_SCREEN_HEIGHT)
+  );
+
+  glutInitWindowPosition(
+    (glutGet(GLUT_SCREEN_WIDTH)-640)/2,
+    (glutGet(GLUT_SCREEN_HEIGHT)-480)/2
+  );
 
   if(glutCreateWindow("Maze - The Hunter") < 1) {
     exit(EXIT_FAILURE);
   }
-  glutReshapeFunc(reshapeWindow);
-}
-
-void reshapeWindow(int w, int h) {
-  glViewport(0, 0, (GLsizei) w, (GLsizei) h);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  if (w <= h)
-    glOrtho (-1.5, 1.5, -1.5*(GLfloat)h/(GLfloat)w,
-        1.5*(GLfloat)h/(GLfloat)w, -10.0, 10.0);
-  else
-    glOrtho (-1.5*(GLfloat)w/(GLfloat)h,
-        1.5*(GLfloat)w/(GLfloat)h, -1.5, 1.5, -10.0, 10.0);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
 }
 
 void startingFieldOfView() {
   glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
 
   if (DIMENSION_Z > DIMENSION_X) {
     glFrustum(
@@ -137,17 +161,9 @@ void startingFieldOfView() {
   }
 
   glMatrixMode(GL_MODELVIEW);
-  gluLookAt(
-    PLAYER.Eye_x, PLAYER.Eye_y, PLAYER.Eye_z, 
-    PLAYER.Eye_x, PLAYER.Eye_y, PLAYER.Eye_z + viewDistance, 
-    0, 1, 0
-  );
-
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
   glEnable(GL_TEXTURE_2D);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
   glEnable(GL_DEPTH_TEST);
 }
@@ -191,24 +207,15 @@ void loadTexture() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 }
 
-void readEntry(int argc, char* argv[]) {
-  FILE *fl_input;
-  fl_input = fopen(argv[1], "r" );
-
-  fscanf(fl_input, "%d %d", &DIMENSION_Z, &DIMENSION_X);
-
+void setVariables() {
   printf("**********************************\n");
   printf("============== MAZE ==============\n");
   printf("**********************************\n");
 
-  MAP = (int **) malloc(DIMENSION_Z * sizeof(int *));
   for(int i = 0; i < DIMENSION_Z; i++) {
-    MAP[i] = (int *) malloc(DIMENSION_X * sizeof(int));
-    for(int j = 0, bufferFile = 0; j < DIMENSION_X; j++) {
-      fscanf(fl_input, "%d ", &bufferFile);
-      printf("%d ", bufferFile);
-      MAP[i][j] = bufferFile;
-      if (bufferFile == PLAYER_START_POSITION) {
+    for(int j = 0; j < DIMENSION_X; j++) {
+      printf("%d ", MAP[i][j]);
+      if (MAP[i][j] == PLAYER_START_POSITION) {
         PLAYER.Eye_x = (double)j;
         PLAYER.Eye_y = (double)edgeLength/2.0;
         PLAYER.Eye_z = (double)i;
@@ -216,10 +223,24 @@ void readEntry(int argc, char* argv[]) {
     }
     printf("\n");
   }
-  fclose( fl_input );
-
   viewDistance = DIMENSION_Z/2.0;
+  
   PLAYER.angle = 0;
+  PLAYER.color_R = 1.0;
+  PLAYER.color_G = 0.0;
+  PLAYER.color_B = 0.0;
+  PLAYER.color_opacity = 1.0;
+
+  SUN.light_x = DIMENSION_X/2.0;
+  SUN.light_z = DIMENSION_Z/2.0;
+  SUN.light_y = 10*edgeLength;
+  SUN.light_opacity = 1.0;
+
+  SUN.color_R = 1.0;
+  SUN.color_G = 1.0;
+  SUN.color_B = 1.0;
+  SUN.color_opacity = 1.0;
+
   printf("DIMENSION X: %d -- DIMENSION Z: %d\n",DIMENSION_X, DIMENSION_Z );
   printf("PLAYER CAM: (%.3f, %.3f, %.3f)\n", PLAYER.Eye_x, PLAYER.Eye_y, PLAYER.Eye_z);
 }
@@ -275,8 +296,8 @@ void handleKeyboard(unsigned char key, int x, int y) {
       } else {
         MAP_VIEW_MODE = true;
         gluLookAt(
-          DIMENSION_X/2.0, (DIMENSION_X/2.0) + (DIMENSION_Z/2.0), DIMENSION_Z/2.0, 
-          PLAYER.Eye_x, PLAYER.Eye_y, PLAYER.Eye_z, 
+          SUN.light_x, SUN.light_y, SUN.light_z,
+          PLAYER.Eye_x, PLAYER.Eye_y, PLAYER.Eye_z,
           0, 0, 1
         );
         glutPostRedisplay();
@@ -288,19 +309,18 @@ void handleKeyboard(unsigned char key, int x, int y) {
 }
 // --------------------- SUN ---------------------//
 void createSun() {
-  GLfloat light_position[] = { DIMENSION_X/2.0, (DIMENSION_X/2.0) + (DIMENSION_Z/2.0), DIMENSION_Z/2.0, 1.0 };
-  GLfloat light_diffuse[]={1.0, 1.0, 1.0, 1.0};
-  GLfloat mat_diffuse[]={0.0, 1.0, 0.0, 1.0};
+  GLfloat light_position[] = { SUN.light_x, SUN.light_y, SUN.light_z, SUN.light_opacity };
+  GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
+  GLfloat mat_diffuse[] = {1.0, 1.0, 1.0, 1.0};
 
-  glClearColor (1.0, 1.0, 1.0, 1.0);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+
+  glClearColor (SUN.color_R, SUN.color_G, SUN.color_B, SUN.color_opacity);
 
   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
   glLightfv(GL_LIGHT0, GL_SPECULAR, light_diffuse);
   glMaterialfv(GL_FRONT, GL_AMBIENT, mat_diffuse);
-
-  glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
-  glClear(GL_COLOR_BUFFER_BIT);
 
   glPushMatrix();
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
@@ -311,26 +331,20 @@ void createSun() {
 
 // --------------------- FLOOR ---------------------//
 void createFloorBlock(double x, double y, double z) {
-  glActiveTexture(GL_TEXTURE1);
+  glPushMatrix();
+    glActiveTexture(GL_TEXTURE1);
 
-  glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(x, y, z);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(x, y, z + edgeLength);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(x + edgeLength, y, z + edgeLength);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(x + edgeLength, y, z);
-  glEnd();
-  /*
-  printf("----- { Create Floor Block } -----\n");
-  printf("(%f, %f, %f)\n", x, y, z);
-  printf("(%f, %f, %f)\n", x, y, z + edgeLength);
-  printf("(%f, %f, %f)\n", x + edgeLength, y, z + edgeLength);
-  printf("(%f, %f, %f)\n", x + edgeLength, y, z);
-  printf("----- -----\n\n");
-  */
+    glBegin(GL_QUADS);
+      glTexCoord2f(0.0, 0.0);
+      glVertex3f(x, y, z);
+      glTexCoord2f(0.0, 1.0);
+      glVertex3f(x, y, z + edgeLength);
+      glTexCoord2f(1.0, 1.0);
+      glVertex3f(x + edgeLength, y, z + edgeLength);
+      glTexCoord2f(1.0, 0.0);
+      glVertex3f(x + edgeLength, y, z);
+    glEnd();
+  glPopMatrix();
 }
 
 void makeFloor() {
@@ -346,83 +360,59 @@ void makeFloor() {
 
 // --------------------- WALL ---------------------//
 void createSideWallBlock(double x, double y, double z) {
-  glActiveTexture(GL_TEXTURE0);
+  glPushMatrix();
+    glActiveTexture(GL_TEXTURE0);
 
-  glBegin(GL_QUADS);
+    glBegin(GL_QUADS);
+      glTexCoord2f(0.0, 0.0);
+      glVertex3f(x, y, z);
+      glTexCoord2f(1.0, 0.0);
+      glVertex3f(x + edgeLength, y, z);
+      glTexCoord2f(1.0, 1.0);
+      glVertex3f(x + edgeLength, y + edgeLength, z);
+      glTexCoord2f(0.0, 1.0);
+      glVertex3f(x, y + edgeLength, z);
+    glEnd();
+
+    glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0);
-    glVertex3f(x, y, z);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(x + edgeLength, y, z);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(x + edgeLength, y + edgeLength, z);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(x, y + edgeLength, z);
-  glEnd();
-
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0);
-    glVertex3f(x, y, z);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(x, y + edgeLength, z);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(x + edgeLength, y + edgeLength, z);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(x + edgeLength, y, z);
-  glEnd();
-
-  /*
-  printf("----- { Create Side Wall Block } -----\n");
-  printf("(%f, %f, %f)\n", x, y, z);
-  printf("(%f, %f, %f)\n", x + edgeLength, y, z);
-  printf("(%f, %f, %f)\n", x + edgeLength, y + edgeLength, z);
-  printf("(%f, %f, %f)\n", x, y + edgeLength, z);
-  printf("----- -----\n");
-  printf("(%f, %f, %f)\n", x, y, z);
-  printf("(%f, %f, %f)\n", x, y + edgeLength, z);
-  printf("(%f, %f, %f)\n", x + edgeLength, y + edgeLength, z);
-  printf("(%f, %f, %f)\n", x + edgeLength, y, z);  
-  printf("----- -----\n\n");
-  */
+      glVertex3f(x, y, z);
+      glTexCoord2f(0.0, 1.0);
+      glVertex3f(x, y + edgeLength, z);
+      glTexCoord2f(1.0, 1.0);
+      glVertex3f(x + edgeLength, y + edgeLength, z);
+      glTexCoord2f(1.0, 0.0);
+      glVertex3f(x + edgeLength, y, z);
+    glEnd();
+  glPopMatrix();
 }
 
 void createDownWallBlock(double x, double y, double z) {
-  glActiveTexture(GL_TEXTURE0);
+  glPushMatrix();
+    glActiveTexture(GL_TEXTURE0);
 
-  glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(x, y, z);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(x, y + edgeLength, z);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(x, y + edgeLength, z + edgeLength);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(x, y, z + edgeLength);
-  glEnd();
+    glBegin(GL_QUADS);
+      glTexCoord2f(0.0, 0.0);
+      glVertex3f(x, y, z);
+      glTexCoord2f(0.0, 1.0);
+      glVertex3f(x, y + edgeLength, z);
+      glTexCoord2f(1.0, 1.0);
+      glVertex3f(x, y + edgeLength, z + edgeLength);
+      glTexCoord2f(1.0, 0.0);
+      glVertex3f(x, y, z + edgeLength);
+    glEnd();
 
-  glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(x, y, z);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(x, y, z + edgeLength);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(x, y + edgeLength, z + edgeLength);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(x, y + edgeLength, z);
-  glEnd();
-
-  /*
-  printf("----- { Create Down Wall Block } -----\n");
-  printf("(%f, %f, %f)\n", x, y, z);
-  printf("(%f, %f, %f)\n", x, y + edgeLength, z);
-  printf("(%f, %f, %f)\n", x, y + edgeLength, z + edgeLength);
-  printf("(%f, %f, %f)\n", x, y, z + edgeLength);  
-  printf("----- -----\n");
-  printf("(%f, %f, %f)\n", x, y, z);
-  printf("(%f, %f, %f)\n", x, y, z + edgeLength);
-  printf("(%f, %f, %f)\n", x, y + edgeLength, z + edgeLength);
-  printf("(%f, %f, %f)\n", x, y + edgeLength, z);  
-  printf("----- -----\n\n");
-  */
+    glBegin(GL_QUADS);
+      glTexCoord2f(0.0, 0.0);
+      glVertex3f(x, y, z);
+      glTexCoord2f(1.0, 0.0);
+      glVertex3f(x, y, z + edgeLength);
+      glTexCoord2f(1.0, 1.0);
+      glVertex3f(x, y + edgeLength, z + edgeLength);
+      glTexCoord2f(0.0, 1.0);
+      glVertex3f(x, y + edgeLength, z);
+    glEnd();
+  glPopMatrix();
 }
 
 void makeWall(){
@@ -443,27 +433,20 @@ void makeWall(){
 
 // --------------------- ROOF ---------------------//
 void createRoofBlock(double x, double y, double z) {
-  glActiveTexture(GL_TEXTURE2);
+  glPushMatrix();
+    glActiveTexture(GL_TEXTURE2);
 
-  glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(x, y, z);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(x + edgeLength, y, z);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(x + edgeLength, y, z + edgeLength);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(x, y, z + edgeLength);
-  glEnd();
-
-  /*
-  printf("----- { Create Roof Block } -----\n");
-  printf("(%f, %f, %f)\n", x, y, z);
-  printf("(%f, %f, %f)\n", x + edgeLength, y, z);
-  printf("(%f, %f, %f)\n", x + edgeLength, y, z + edgeLength);
-  printf("(%f, %f, %f)\n", x, y, z + edgeLength);
-  printf("----- -----\n\n");
-  */
+    glBegin(GL_QUADS);
+      glTexCoord2f(0.0, 0.0);
+      glVertex3f(x, y, z);
+      glTexCoord2f(1.0, 0.0);
+      glVertex3f(x + edgeLength, y, z);
+      glTexCoord2f(1.0, 1.0);
+      glVertex3f(x + edgeLength, y, z + edgeLength);
+      glTexCoord2f(0.0, 1.0);
+      glVertex3f(x, y, z + edgeLength);
+    glEnd();
+  glPopMatrix();
 }
 
 void makeRoof() {
@@ -480,25 +463,29 @@ void makeRoof() {
 // --------------------- PLAYER LOCATION --------------------- //
 void createPlayerSphere() {
   glPushMatrix();
-    glTranslatef(PLAYER.Eye_x, PLAYER.Eye_y, PLAYER.Eye_z);
     glColor3f(1.0, 0.0, 0.0);
+    glTranslatef(PLAYER.Eye_x, 0, 0);
+    glTranslatef(0, 0, PLAYER.Eye_z);
     glutSolidSphere(1.0, 5, 4);
   glPopMatrix();
 }
+
 void createPlayer() {
-  gluLookAt(
-    PLAYER.Eye_x, PLAYER.Eye_y, PLAYER.Eye_z, 
-    PLAYER.Eye_x + viewDistance, PLAYER.Eye_y + viewDistance, PLAYER.Eye_z + viewDistance, 
-    0, 1, 0
-  );
+  glPushMatrix();
+    gluLookAt(
+      PLAYER.Eye_x, PLAYER.Eye_y, PLAYER.Eye_z,
+      PLAYER.Eye_x + viewDistance, PLAYER.Eye_y, PLAYER.Eye_z + viewDistance,
+      0, 1, 0
+    );
+  glPopMatrix();
 }
 
 // --------------------- Maze The Devil --------------------- //
-void makeWorld(){
+void makeWorld() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
   glPushMatrix();
-    if (!MAP_VIEW_MODE) {
+    if(!MAP_VIEW_MODE) {
       makeRoof();
       createPlayer();
     } else {
@@ -506,17 +493,8 @@ void makeWorld(){
     }
     makeFloor();
     makeWall();
+    createSun();
   glPopMatrix();
   glutSwapBuffers();
   glFlush();
-}
-
-// ---------------------------------------------------------- //
-bool wallSideShock(double newPosition_x) {
-  if(newPosition_x >= DIMENSION_X -1 || newPosition_x <= 0.0)
-    return true;
-  if ((fmod((newPosition_x), 1.0) == 0.0) && (MAP[(int)(PLAYER.Eye_z/1)][(int)(newPosition_x)] == WALL && MAP[(int)(PLAYER.Eye_z/1)+1][(int)(newPosition_x)] == WALL)) {
-    return true;
-  }
-  return false;
 }
